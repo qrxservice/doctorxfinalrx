@@ -188,6 +188,15 @@ type CalculatorDefinition = {
   calculate: (values: Record<string, string>) => string | null;
 };
 
+type ManagedCalculator = {
+  id: number;
+  title: string;
+  shortDescription?: string | null;
+  fieldsJson?: unknown;
+  formulasJson?: unknown;
+  resultsJson?: unknown;
+};
+
 // CalculatorDialog handles the inputs, action, result area, and closing
 // behavior for every calculator listed in the header menu.
 const CALCULATOR_REGISTRY: CalculatorDefinition[] = [
@@ -209,6 +218,57 @@ const CALCULATOR_REGISTRY: CalculatorDefinition[] = [
     },
   },
 ];
+
+const toManagedCalculator = (calculator: ManagedCalculator): CalculatorDefinition => {
+  const fields = Array.isArray(calculator.fieldsJson)
+    ? calculator.fieldsJson.flatMap(field => {
+        if (!field || typeof field !== "object") return [];
+        const value = field as Record<string, unknown>;
+        if (typeof value.name !== "string" && typeof value.key !== "string") return [];
+        return [{
+          key: String(value.name ?? value.key),
+          label: String(value.label ?? value.name ?? value.key),
+          ...(typeof value.placeholder === "string" ? { placeholder: value.placeholder } : {}),
+        }];
+      })
+    : [];
+
+  return {
+    key: `managed-${calculator.id}`,
+    label: calculator.title,
+    description: calculator.shortDescription ?? undefined,
+    fields,
+    calculate: values => {
+      const formulas = Array.isArray(calculator.formulasJson) ? calculator.formulasJson : [];
+      const computed: Record<string, number> = {};
+      for (const formula of formulas) {
+        if (!formula || typeof formula !== "object") continue;
+        const definition = formula as Record<string, unknown>;
+        if (typeof definition.name !== "string" || typeof definition.expression !== "string") continue;
+        try {
+          const names = Object.keys({ ...values, ...computed });
+          const numbers = names.map(name => Number(values[name] ?? computed[name]));
+          const result = new Function(...names, `"use strict"; return (${definition.expression});`)(...numbers);
+          if (typeof result === "number" && Number.isFinite(result)) computed[definition.name] = result;
+        } catch {
+          return null;
+        }
+      }
+      const results = Array.isArray(calculator.resultsJson) ? calculator.resultsJson : [];
+      const resultDefinition = results.find(result => {
+        if (!result || typeof result !== "object") return false;
+        const formulaName = (result as Record<string, unknown>).formulaName;
+        return typeof formulaName === "string" && computed[formulaName] !== undefined;
+      }) as Record<string, unknown> | undefined;
+      const formulaName = typeof resultDefinition?.formulaName === "string" ? resultDefinition.formulaName : Object.keys(computed)[0];
+      if (!formulaName || computed[formulaName] === undefined) return null;
+      const value = computed[formulaName];
+      const unit = typeof resultDefinition?.unit === "string" ? ` ${resultDefinition.unit}` : "";
+      const title = typeof resultDefinition?.title === "string" ? resultDefinition.title : calculator.title;
+      return `${title}: ${Number.isInteger(value) ? value : value.toFixed(2)}${unit}`;
+    },
+  };
+};
 
 interface LocalPrescriptionDraft {
   version: 1;
@@ -890,15 +950,10 @@ export default function NewPrescriptionPage() {
   const [templatePopoverStyle, setTemplatePopoverStyle] = useState<CSSProperties | undefined>();
   const [activeCalculatorKey, setActiveCalculatorKey] = useState<string | null>(null);
   const [customTools, setCustomTools] = useState<ExternalToolDefinition[]>([]);
-  const [showNewToolDialog, setShowNewToolDialog] = useState(false);
-  const [newToolKind, setNewToolKind] = useState<ExternalToolDefinition["kind"]>("calculator");
-  const [newToolLabel, setNewToolLabel] = useState("");
-  const [newToolDescription, setNewToolDescription] = useState("");
-  const [newToolFields, setNewToolFields] = useState('[{"key":"value","label":"Value","placeholder":"10"}]');
-  const [newToolCode, setNewToolCode] = useState('return Number(values.value) || 0;');
   const [showQuickTools, setShowQuickTools] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showNewToolNotice, setShowNewToolNotice] = useState(false);
+  const [managedCalculators, setManagedCalculators] = useState<ManagedCalculator[]>([]);
   const [showTemplateForm, setShowTemplateForm] = useState(false);
   const [isManageTemplates, setIsManageTemplates] = useState(false);
   const [allTemplatesGrouped, setAllTemplatesGrouped] = useState<Record<string, any[]>>({});
@@ -1062,8 +1117,12 @@ export default function NewPrescriptionPage() {
     [customTools],
   );
   const calculatorRegistry = useMemo(
-    () => [...CALCULATOR_REGISTRY, ...customCalculators],
-    [customCalculators],
+    () => [
+      ...CALCULATOR_REGISTRY,
+      ...customCalculators,
+      ...managedCalculators.map(toManagedCalculator),
+    ],
+    [customCalculators, managedCalculators],
   );
   const quickToolRegistry = useMemo(
     () => [...QUICK_TOOL_REGISTRY, ...customQuickTools],
@@ -1078,67 +1137,11 @@ export default function NewPrescriptionPage() {
       onClick: () => setShowTemplates(v => !v),
       indicator: showTemplates ? "−" : "+",
     },
-    {
-      key: "new-tool",
-      label: isBn ? "নতুন টুল" : "New Tool",
-      icon: Plus,
-      onClick: () => {
-        setShowNewToolNotice(true);
-        setNewToolKind("tool");
-        setShowNewToolDialog(true);
-      },
-      indicator: "+",
-    },
   ];
 
-  const openNewToolDialog = (kind: ExternalToolDefinition["kind"]) => {
-    setNewToolKind(kind);
-    setNewToolLabel("");
-    setNewToolDescription("");
-    setNewToolFields('[{"key":"value","label":"Value","placeholder":"10"}]');
-    setNewToolCode("return Number(values.value) || 0;");
-    setShowNewToolDialog(true);
-  };
 
-  const saveExternalTool = () => {
-    const label = newToolLabel.trim();
-    if (!label || !newToolCode.trim()) {
-      toast({ title: isBn ? "নাম ও কোড দিন" : "Add a name and code first", variant: "destructive" });
-      return;
-    }
-    let fields: QuickToolField[];
-    try {
-      const parsed = JSON.parse(newToolFields);
-      if (!Array.isArray(parsed) || parsed.some(field => !field || typeof field.key !== "string" || typeof field.label !== "string")) {
-        throw new Error("Fields must be an array of objects with key and label.");
-      }
-      fields = parsed.map(field => ({
-        key: field.key.trim(),
-        label: field.label.trim(),
-        ...(typeof field.placeholder === "string" ? { placeholder: field.placeholder } : {}),
-      }));
-      if (fields.length === 0) throw new Error("Add at least one field.");
-    } catch (error) {
-      toast({ title: isBn ? "Fields JSON ঠিক করুন" : error instanceof Error ? error.message : "Invalid fields JSON", variant: "destructive" });
-      return;
-    }
-    const definition: ExternalToolDefinition = {
-      key: `custom-${newToolKind}-${Date.now()}`,
-      kind: newToolKind,
-      label,
-      description: newToolDescription.trim() || undefined,
-      fields,
-      code: newToolCode.trim(),
-    };
-    setCustomTools(previous => {
-      const next = [...previous, definition];
-      try { localStorage.setItem(customToolsStorageKey, JSON.stringify(next)); } catch { /* local storage is optional */ }
-      return next;
-    });
-    setShowNewToolDialog(false);
-    setShowNewToolNotice(true);
-    toast({ title: isBn ? "নতুন টুল যোগ হয়েছে" : `${label} added` });
-  };
+
+;
 
   const savePrintLabel = editingId != null ? (isBn ? "আপডেট ও প্রিন্ট" : "Update & Print") : L.savePrint;
   const saveOnlyLabel = editingId != null ? (isBn ? "আপডেট" : "Update") : L.saveOnly;
@@ -2612,10 +2615,6 @@ export default function NewPrescriptionPage() {
               <div className="px-2 py-1.5 text-xs text-muted-foreground">No calculators configured yet.</div>
             )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-sm gap-2" onClick={() => openNewToolDialog("calculator")}>
-              <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-              {isBn ? "নতুন ক্যালকুলেটর যোগ করুন" : "Add calculator"}
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         </div>
@@ -3023,18 +3022,12 @@ export default function NewPrescriptionPage() {
                         </Button>
                       );
                     })}
-                    {showNewToolNotice && (
-                      quickToolRegistry.length > 0 ? (
-                        <div className="space-y-1.5">
-                          {quickToolRegistry.map(tool => (
-                            <QuickClinicalTool key={tool.key} tool={tool} />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded border border-dashed border-teal-300 bg-background px-2 py-1.5 text-xs text-muted-foreground dark:border-teal-800">
-                          {isBn ? "নতুন টুল যোগ করতে উপরের New Tool চাপুন।" : "Use New Tool above to paste and add a tool."}
-                        </div>
-                      )
+                    {quickToolRegistry.length > 0 && (
+                      <div className="space-y-1.5">
+                        {quickToolRegistry.map(tool => (
+                          <QuickClinicalTool key={tool.key} tool={tool} />
+                        ))}
+                      </div>
                     )}
                     {visibleMedicineShortcuts.length > 0 && (
                       <div className="mt-2 space-y-1">
@@ -4335,77 +4328,6 @@ export default function NewPrescriptionPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowPageDlg(false)}>{L.cancel}</Button>
             <Button className="bg-teal-600 hover:bg-teal-700" onClick={saveSettings} disabled={updateSettings.isPending}>{L.saveSettings}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showNewToolDialog} onOpenChange={setShowNewToolDialog}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              {newToolKind === "calculator"
-                ? (isBn ? "নতুন ক্যালকুলেটর যোগ করুন" : "Add a calculator")
-                : (isBn ? "নতুন টুল যোগ করুন" : "Add a quick tool")}
-            </DialogTitle>
-            <DialogDescription>
-              {isBn
-                ? "নাম, input fields-এর JSON এবং JavaScript code body দিন। কোডে values ব্যবহার করুন।"
-                : "Paste a JavaScript function body. Read inputs from values and return the result, for example: return Number(values.value) * 2;"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-1">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1 text-sm">
-                <span className="text-muted-foreground">{isBn ? "ধরন" : "Type"}</span>
-                <select
-                  className="flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm"
-                  value={newToolKind}
-                  onChange={event => setNewToolKind(event.target.value as ExternalToolDefinition["kind"])}
-                >
-                  <option value="calculator">{isBn ? "ক্যালকুলেটর" : "Calculator"}</option>
-                  <option value="tool">{isBn ? "কুইক টুল" : "Quick tool"}</option>
-                </select>
-              </label>
-              <label className="space-y-1 text-sm">
-                <span className="text-muted-foreground">{isBn ? "নাম" : "Name"}</span>
-                <Input value={newToolLabel} onChange={event => setNewToolLabel(event.target.value)} placeholder="e.g. Dose total" />
-              </label>
-            </div>
-            <label className="block space-y-1 text-sm">
-              <span className="text-muted-foreground">{isBn ? "সংক্ষিপ্ত বিবরণ" : "Description (optional)"}</span>
-              <Input value={newToolDescription} onChange={event => setNewToolDescription(event.target.value)} placeholder="What this tool calculates" />
-            </label>
-            <label className="block space-y-1 text-sm">
-              <span className="text-muted-foreground">{isBn ? "Input fields JSON" : "Input fields JSON"}</span>
-              <Textarea
-                value={newToolFields}
-                onChange={event => setNewToolFields(event.target.value)}
-                className="min-h-24 font-mono text-xs"
-                spellCheck={false}
-              />
-              <span className="text-[11px] text-muted-foreground">
-                Example: [{`{"key":"weight","label":"Weight (kg)","placeholder":"65"}`}]
-              </span>
-            </label>
-            <label className="block space-y-1 text-sm">
-              <span className="text-muted-foreground">{isBn ? "External JavaScript code" : "External JavaScript code body"}</span>
-              <Textarea
-                value={newToolCode}
-                onChange={event => setNewToolCode(event.target.value)}
-                className="min-h-36 font-mono text-xs"
-                spellCheck={false}
-              />
-              <span className="text-[11px] text-muted-foreground">
-                {isBn ? "উদাহরণ: return Number(values.weight) * 2;" : "Example: return Number(values.weight) * 2; — use values.fieldKey for inputs."}
-              </span>
-            </label>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewToolDialog(false)}>{L.cancel}</Button>
-            <Button className="bg-teal-600 hover:bg-teal-700" onClick={saveExternalTool}>
-              <Save className="mr-1.5 h-4 w-4" />{isBn ? "যোগ করুন" : "Add tool"}
-            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

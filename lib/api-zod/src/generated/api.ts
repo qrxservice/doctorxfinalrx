@@ -2290,7 +2290,7 @@ export const ListMedicinesResponse = zod.array(ListMedicinesResponseItem)
 
 
 /**
- * @summary Add medicine to database (admin only)
+ * @summary Add medicine to database (doctor/admin)
  */
 export const CreateMedicineBody = zod.object({
   "brandName": zod.string(),

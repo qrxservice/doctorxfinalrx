@@ -40,7 +40,7 @@ router.get("/prescriptions", async (req, res): Promise<void> => {
   const paged = all.slice(offset, offset + limitNum);
   const enriched = await Promise.all(paged.map(async (p) => {
     const [doc] = await db.select().from(doctorsTable).where(eq(doctorsTable.id, p.doctorId));
-    const items = await db.select().from(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, p.id));
+    const items = await db.select().from(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, p.id)).orderBy(prescriptionItemsTable.sortOrder);
     return { ...p, doctorName: doc?.name ?? null, items, createdAt: p.createdAt.toISOString() };
   }));
 
@@ -76,9 +76,9 @@ router.post("/prescriptions", async (req, res): Promise<void> => {
 
   const insertedItems = [];
   if (Array.isArray(items)) {
-    for (const item of items) {
+    for (const [sortOrder, item] of items.entries()) {
       const [inserted] = await db.insert(prescriptionItemsTable).values({
-        prescriptionId: presc.id, medicineId: item.medicineId ?? null,
+        prescriptionId: presc.id, sortOrder, medicineId: item.medicineId ?? null,
         medicineName: item.medicineName, genericName: item.genericName ?? null,
         strength: item.strength ?? null, dosageForm: item.dosageForm ?? null,
         dose: item.dose ?? null, duration: item.duration ?? null,
@@ -134,7 +134,7 @@ router.get("/prescriptions/:id", async (req, res): Promise<void> => {
   const [presc] = await db.select().from(prescriptionsTable).where(eq(prescriptionsTable.id, id));
   if (!presc) { res.status(404).json({ error: "Not found" }); return; }
   if (presc.doctorId !== doctorId) { res.status(403).json({ error: "Forbidden" }); return; }
-  const items = await db.select().from(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, id));
+  const items = await db.select().from(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, id)).orderBy(prescriptionItemsTable.sortOrder);
   const [doc] = await db.select().from(doctorsTable).where(eq(doctorsTable.id, presc.doctorId));
   res.json({ ...presc, doctorName: doc?.name ?? null, items, createdAt: presc.createdAt.toISOString() });
 });
@@ -173,9 +173,9 @@ router.put("/prescriptions/:id", async (req, res): Promise<void> => {
   await db.delete(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, id));
   const insertedItems = [];
   if (Array.isArray(items)) {
-    for (const item of items) {
+    for (const [sortOrder, item] of items.entries()) {
       const [inserted] = await db.insert(prescriptionItemsTable).values({
-        prescriptionId: id, medicineId: item.medicineId ?? null,
+        prescriptionId: id, sortOrder, medicineId: item.medicineId ?? null,
         medicineName: item.medicineName, genericName: item.genericName ?? null,
         strength: item.strength ?? null, dosageForm: item.dosageForm ?? null,
         dose: item.dose ?? null, duration: item.duration ?? null,
@@ -218,7 +218,7 @@ router.get("/admin/prescriptions", async (req, res): Promise<void> => {
   const total = all.length;
   const paged = all.slice((pageNum - 1) * limitNum, pageNum * limitNum);
   const prescriptions = await Promise.all(paged.map(async (p) => {
-    const items = await db.select().from(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, p.id));
+    const items = await db.select().from(prescriptionItemsTable).where(eq(prescriptionItemsTable.prescriptionId, p.id)).orderBy(prescriptionItemsTable.sortOrder);
     return { ...p, doctorName: docById.get(p.doctorId)?.name ?? null, items, createdAt: p.createdAt.toISOString() };
   }));
   res.json({ total, prescriptions });

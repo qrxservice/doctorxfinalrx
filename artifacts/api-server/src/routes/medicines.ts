@@ -70,7 +70,7 @@ router.get("/medicines", async (req, res): Promise<void> => {
 
 router.post("/medicines", async (req, res): Promise<void> => {
   const role = await getRole(req.headers.authorization);
-  if (role !== "admin") { res.status(403).json({ error: "Forbidden" }); return; }
+  if (role !== "admin" && role !== "doctor") { res.status(403).json({ error: "Forbidden" }); return; }
   const { brandName, genericName, strength, dosageForm, manufacturer } = req.body;
   if (!brandName) { res.status(400).json({ error: "Brand name required" }); return; }
   const [med] = await db.insert(medicinesTable).values({ brandName, genericName, strength, dosageForm, manufacturer }).returning();
