@@ -30,6 +30,7 @@ export const prescriptionItemsTable = pgTable("prescription_items", {
   id: serial("id").primaryKey(),
   prescriptionId: integer("prescription_id").notNull(),
   medicineId: integer("medicine_id"),
+  sortOrder: integer("sort_order"),
   medicineName: text("medicine_name").notNull(),
   genericName: text("generic_name"),
   strength: text("strength"),
