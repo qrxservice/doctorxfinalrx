@@ -52,13 +52,26 @@ router.post("/prescriptions", async (req, res): Promise<void> => {
   // doctor (assistants share their doctor's id). The body doctorId is ignored.
   const authDoctorId = await getDoctorId(req.headers.authorization);
   if (!authDoctorId) { res.status(401).json({ error: "Not authenticated" }); return; }
-  const { appointmentId, patientName, patientPhone, patientAge, patientGender, diagnosis, notes, items, status } = req.body;
+  const { appointmentId, patientName, patientPhone, patientAge, patientGender, diagnosis, notes, items, status, oldPatient, consultationFee, freePatient } = req.body;
   if (!patientName) { res.status(400).json({ error: "Required fields missing" }); return; }
 
   const { patientWeight, patientHeight, chiefComplaint, vitals, examination, investigations, advice, followUpDate } = req.body;
   const resolvedStatus = status === "draft" ? "draft" : status === "pending_investigation" ? "pending_investigation" : "final";
+  const [doctorProfile] = await db.select({ consultationFee: doctorsTable.consultationFee })
+    .from(doctorsTable).where(eq(doctorsTable.id, authDoctorId));
+  const isOldPatient = oldPatient === true;
+  const isFreePatient = freePatient === true;
+  const requestedFee = consultationFee === null || consultationFee === undefined || consultationFee === ""
+    ? null
+    : Number(consultationFee);
+  const actualFee = isFreePatient
+    ? 0
+    : isOldPatient
+      ? (Number.isFinite(requestedFee) ? requestedFee : doctorProfile?.consultationFee ?? 0)
+      : doctorProfile?.consultationFee ?? 0;
   const [presc] = await db.insert(prescriptionsTable).values({
     doctorId: authDoctorId, appointmentId: appointmentId ? parseInt(appointmentId) : null,
+    oldPatient: isOldPatient, freePatient: isFreePatient, consultationFee: actualFee,
     status: resolvedStatus,
     patientName, patientPhone, patientAge: patientAge ? parseInt(patientAge) : null,
     patientGender, patientWeight: patientWeight ?? null, patientHeight: patientHeight ?? null,
@@ -147,12 +160,25 @@ router.put("/prescriptions/:id", async (req, res): Promise<void> => {
   if (!existing) { res.status(404).json({ error: "Not found" }); return; }
   if (existing.doctorId !== doctorId) { res.status(403).json({ error: "Forbidden" }); return; }
 
-  const { appointmentId, patientName, patientPhone, patientAge, patientGender, diagnosis, notes, items, status } = req.body;
+  const { appointmentId, patientName, patientPhone, patientAge, patientGender, diagnosis, notes, items, status, oldPatient, consultationFee, freePatient } = req.body;
   const { patientWeight, patientHeight, chiefComplaint, vitals, examination, investigations, advice, followUpDate } = req.body;
   const resolvedStatus = status === "draft" ? "draft" : status === "pending_investigation" ? "pending_investigation" : "final";
+  const [doctorProfile] = await db.select({ consultationFee: doctorsTable.consultationFee })
+    .from(doctorsTable).where(eq(doctorsTable.id, existing.doctorId));
+  const isOldPatient = typeof oldPatient === "boolean" ? oldPatient : (existing.oldPatient ?? false);
+  const isFreePatient = typeof freePatient === "boolean" ? freePatient : (existing.freePatient ?? false);
+  const requestedFee = consultationFee === null || consultationFee === undefined || consultationFee === ""
+    ? null
+    : Number(consultationFee);
+  const actualFee = isFreePatient
+    ? 0
+    : isOldPatient
+      ? (Number.isFinite(requestedFee) ? requestedFee : existing.consultationFee ?? doctorProfile?.consultationFee ?? 0)
+      : doctorProfile?.consultationFee ?? existing.consultationFee ?? 0;
 
   const updates: Record<string, unknown> = {
     appointmentId: appointmentId ? parseInt(appointmentId) : existing.appointmentId,
+    oldPatient: isOldPatient, freePatient: isFreePatient, consultationFee: actualFee,
     status: resolvedStatus,
     patientName: patientName ?? existing.patientName,
     patientPhone: patientPhone ?? null,

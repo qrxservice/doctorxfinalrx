@@ -1,0 +1,45 @@
+Inspect the existing live prescription flow first, then make ONLY the following changes. Keep all existing functionality, API contracts, authentication, database data, and UI behavior unchanged unless required for these exact tasks.
+
+1. SHARE
+- Fix the existing Share action so it shares the actual ready prescription content, NOT only patient name/diagnosis.
+- Include doctor/patient info, diagnosis, medicines with dose/timing/duration/instructions, advice, follow-up and relevant prescription sections.
+- Keep the existing WhatsApp/share mechanism.
+- Update all existing Share buttons to use the same logic.
+
+2. TOP HEADER
+- Change only the prescription page top header background to a green theme.
+- Make all header text/icons clearly readable in both light and dark mode.
+- Do not change the existing header actions or their functionality.
+
+3. ADD MEDICINE HEADER
+- Make the existing Add Medicine section/header clearly visible.
+- Ensure text/background contrast works in light and dark mode.
+- Do not change medicine search, add, save, recent medicine or database logic.
+
+4. CONSULTATION SUMMARY
+- Keep the existing Consultation Summary calculation/data flow.
+- Make the summary compact, preferably within 2 rows.
+- Add an Old Patient toggle/checkbox so the doctor can explicitly mark a consultation as Old Patient.
+- Add an editable Old Patient consultation fee.
+- Preserve the existing doctor consultation fee for normal/new patients.
+- Calculate/display Daily, Weekly and Monthly consultation earnings correctly from saved consultation data.
+- Preserve existing Free Patient counting.
+- Persist the old-patient status and actual consultation fee with the prescription/consultation so calculations remain correct after reload.
+
+LIVE SERVER SAFETY:
+- First inspect the existing schema, API routes, save-payload and database structure.
+- Reuse existing fields/APIs whenever possible.
+- If schema/API changes are absolutely required, make only the minimum additive backward-compatible changes.
+- NEVER delete/reset existing data.
+- NEVER use destructive migration, db reset, git reset, git clean, or restore unrelated files.
+- Do not refactor unrelated code.
+- Do not install unnecessary packages.
+
+VALIDATION:
+- Run TypeScript check/build relevant to the changed app.
+- Verify existing prescription save/update still works.
+- Verify old existing prescriptions remain readable.
+- Verify the new Share content and Consultation Summary calculations.
+- Show me exactly which files were changed and a short validation result.
+
+IMPORTANT: Keep this implementation minimal to reduce Agent usage/credits. Do not touch anything outside these requirements.

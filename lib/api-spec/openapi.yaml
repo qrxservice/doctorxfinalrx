@@ -4491,6 +4491,10 @@ components:
           type: integer
         appointmentId:
           type: ["integer", "null"]
+        oldPatient:
+          type: boolean
+        consultationFee:
+          type: ["integer", "null"]
         patientName:
           type: string
         patientPhone:
@@ -4565,6 +4569,12 @@ components:
           type: ["string", "null"]
         appointmentId:
           type: ["integer", "null"]
+        oldPatient:
+          type: boolean
+        freePatient:
+          type: boolean
+        consultationFee:
+          type: ["integer", "null"]
         patientName:
           type: string
         patientPhone:
@@ -4635,6 +4645,12 @@ components:
         doctorId:
           type: integer
         appointmentId:
+          type: integer
+        oldPatient:
+          type: boolean
+        freePatient:
+          type: boolean
+        consultationFee:
           type: integer
         patientName:
           type: string

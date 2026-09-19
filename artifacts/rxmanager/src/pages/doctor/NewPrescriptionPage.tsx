@@ -449,8 +449,9 @@ function rxLabels(isBn: boolean) {
         queuePosition: "কিউ অবস্থান",
          consultationSummary: "পরামর্শ সারসংক্ষেপ", dailyPatients: "আজকের রোগী", dailyEarnings: "আজকের আয়",
          dailyFreePatients: "ফ্রি রোগী", weeklyEarnings: "সাপ্তাহিক আয়", monthlyEarnings: "মাসিক আয়",
-         totalEarnings: "মোট আয়", unavailable: "উপলব্ধ নয়",
-         earningsDataNote: "প্রতি পরামর্শের পেমেন্ট/ফ্রি স্ট্যাটাস সংরক্ষিত না থাকায় আয়ের হিসাব দেখানো যাচ্ছে না।",
+         totalEarnings: "মোট আয়", unavailable: "উপলব্ধ নয়", oldPatient: "পুরনো রোগী",
+         oldPatientFee: "পুরনো রোগীর ফি", normalPatientFee: "সাধারণ রোগীর ফি",
+         earningsDataNote: "সেভ করা প্রেসক্রিপশন থেকে হিসাব করা হয়েছে।",
       }
     : {
         navDashboard: "Dashboard", navNewRx: "New Rx", navPatients: "Patients",
@@ -532,10 +533,11 @@ function rxLabels(isBn: boolean) {
         avgConsultation: "Avg Consultation", firstPatient: "First Patient", lastPatient: "Last Patient",
         daySummaryTitle: "Day Summary", avgWaitTime: "Avg Wait", estWaitNext: "Est. Wait (Next)",
         queuePosition: "Queue Position",
-         consultationSummary: "Consultation Summary", dailyPatients: "Daily Patients", dailyEarnings: "Daily Earnings",
+          consultationSummary: "Consultation Summary", dailyPatients: "Daily Patients", dailyEarnings: "Daily Earnings",
          dailyFreePatients: "Daily Free Patients", weeklyEarnings: "Weekly Earnings", monthlyEarnings: "Monthly Earnings",
-         totalEarnings: "Total Earnings", unavailable: "Unavailable",
-         earningsDataNote: "Earnings are unavailable because payment/free status is not stored per consultation.",
+          totalEarnings: "Total Earnings", unavailable: "Unavailable", oldPatient: "Old Patient",
+          oldPatientFee: "Old patient fee", normalPatientFee: "Profile fee",
+          earningsDataNote: "Calculated from saved prescriptions; older records use the current profile fee when no fee was stored.",
       };
 }
 
@@ -1163,6 +1165,45 @@ export default function NewPrescriptionPage() {
     ? `${doctor.currency === "USD" ? "$" : "৳"}${doctor.consultationFee}`
     : null;
   const [consultationPeriod, setConsultationPeriod] = useState<"today" | "week" | "month" | "all">("today");
+  const [oldPatient, setOldPatient] = useState(false);
+  const [oldPatientFee, setOldPatientFee] = useState("");
+  const [freePatient, setFreePatient] = useState(false);
+  const consultationCurrencySymbol = doctor?.currency === "USD" ? "$" : "৳";
+  const profileConsultationFee = doctor?.consultationFee ?? 0;
+
+  const consultationStats = useMemo(() => {
+    const currentDate = toLocalDateStr(new Date());
+    const currentMonth = currentDate.slice(0, 7);
+    const weekStartDate = new Date();
+    weekStartDate.setHours(0, 0, 0, 0);
+    const mondayOffset = (weekStartDate.getDay() + 6) % 7;
+    weekStartDate.setDate(weekStartDate.getDate() - mondayOffset);
+    const weekStart = toLocalDateStr(weekStartDate);
+    const records = (rxHistory ?? []).filter(record => record.status !== "draft");
+    const feeFor = (record: Prescription) => record.consultationFee ?? profileConsultationFee;
+    const summarize = (items: Prescription[]) => ({
+      patients: items.length,
+      earnings: items.reduce((sum, record) => sum + feeFor(record), 0),
+      freePatients: items.filter(record => record.freePatient === true || feeFor(record) <= 0).length,
+    });
+    return {
+      daily: summarize(records.filter(record => toLocalDateStr(new Date(record.createdAt)) === currentDate)),
+      weekly: summarize(records.filter(record => {
+        const date = toLocalDateStr(new Date(record.createdAt));
+        return date >= weekStart && date <= currentDate;
+      })),
+      monthly: summarize(records.filter(record => toLocalDateStr(new Date(record.createdAt)).slice(0, 7) === currentMonth)),
+      total: summarize(records),
+    };
+  }, [profileConsultationFee, rxHistory]);
+
+  const selectedConsultationStats = consultationPeriod === "today"
+    ? consultationStats.daily
+    : consultationPeriod === "week"
+      ? consultationStats.weekly
+      : consultationPeriod === "month"
+        ? consultationStats.monthly
+        : consultationStats.total;
 
   const shortcutKey = (med: Omit<MedItem, "id">) =>
     [med.brandName, med.genericName, med.strength, med.dosageForm, med.dose, med.durationNum, med.durationUnit, med.timing, med.instructions]
@@ -2071,6 +2112,15 @@ export default function NewPrescriptionPage() {
     setAdvice(rx.advice ?? "");
     setTreatmentNote(rx.notes ?? "");
     setFollowUpDate(rx.followUpDate ?? "");
+    setOldPatient(!!rx.oldPatient);
+    setFreePatient(!!rx.freePatient);
+    setOldPatientFee(
+      rx.consultationFee != null
+        ? String(rx.consultationFee)
+        : doctor?.consultationFee != null
+          ? String(doctor.consultationFee)
+          : "",
+    );
     setMedicines((rx.items ?? []).map(it => {
       const dur = (it.duration ?? "").trim();
       const dm = dur.match(/(\d+)/);
@@ -2142,6 +2192,9 @@ export default function NewPrescriptionPage() {
     setTreatmentNote("");
     setFollowUpDate("");
     setDiagnosis("");
+    setOldPatient(false);
+    setFreePatient(false);
+    setOldPatientFee(doctor?.consultationFee != null ? String(doctor.consultationFee) : "");
     setSavedRx(null);
     setEditingId(null);
     setQrDataUrl(null);
@@ -2183,6 +2236,55 @@ export default function NewPrescriptionPage() {
   };
 
   // ── Submit prescription
+  const sharePrescription = () => {
+    const ageSex = [
+      patient.age ? `${patient.age}${patient.ageUnit === "Y" ? "y" : patient.ageUnit}` : "",
+      patient.sex === "F" ? L.female : patient.sex === "O" ? L.other : patient.sex === "M" ? L.male : "",
+    ].filter(Boolean).join(" / ");
+    const medicineLines = medicines.length > 0
+      ? medicines.map((medicine, index) => {
+          const details = [
+            medicine.dose,
+            medicine.timing,
+            medicine.durationNum.trim()
+              ? `${medicine.durationNum.trim()} ${medicine.durationUnit === "D" ? "days" : medicine.durationUnit === "W" ? "weeks" : "months"}`
+              : "",
+            medicine.instructions,
+          ].filter(Boolean).join(" — ");
+          return `${index + 1}. ${medicine.brandName || medicine.genericName}${medicine.strength ? ` ${medicine.strength}` : ""}${medicine.dosageForm ? ` (${medicine.dosageForm})` : ""}${medicine.genericName && medicine.brandName ? ` [${medicine.genericName}]` : ""}${details ? ` — ${details}` : ""}`;
+        })
+      : ["No medicines prescribed"];
+    const sections = [
+      `Doctor: ${screenHName}`,
+      screenHDegree ? `Qualification: ${screenHDegree}` : "",
+      screenHDesignation ? `Specialty: ${screenHDesignation}` : "",
+      screenHHospital ? `Chamber: ${screenHHospital}` : "",
+      screenHAddress ? `Address: ${screenHAddress}` : "",
+      screenHPhone ? `Phone: ${screenHPhone}` : "",
+      "",
+      `Patient: ${patient.name || "—"}`,
+      ageSex ? `Age/Sex: ${ageSex}` : "",
+      patient.phone ? `Mobile: ${patient.phone}` : "",
+      patient.address ? `Address: ${patient.address}` : "",
+      `Date: ${patient.date || toLocalDateStr(new Date())}`,
+      oldPatient ? `Patient type: Old Patient (${consultationCurrencySymbol}${oldPatientFee || profileConsultationFee})` : `Consultation fee: ${consultationCurrencySymbol}${profileConsultationFee}`,
+      patient.cc ? `Chief complaint: ${patient.cc}` : "",
+      patient.oe ? `Examination: ${patient.oe}` : "",
+      patient.drugHistory ? `Drug history: ${patient.drugHistory}` : "",
+      diagnosis ? `Diagnosis: ${diagnosis}` : "",
+      [...patient.ixChips, patient.ixCustom].filter(Boolean).length > 0
+        ? `Investigations: ${[...patient.ixChips, patient.ixCustom].filter(Boolean).join(", ")}`
+        : "",
+      "",
+      "Prescription:",
+      ...medicineLines,
+      advice ? `\nAdvice:\n${advice}` : "",
+      treatmentNote ? `\nTreatment note:\n${treatmentNote}` : "",
+      followUpDate ? `Follow-up: ${followUpDate}` : "",
+    ].filter(Boolean);
+    window.open(`https://wa.me/?text=${encodeURIComponent(sections.join("\n"))}`, "_blank", "noopener,noreferrer");
+  };
+
   const handleSave = async (printAfter = false, explicitStatus: "final" | "draft" | "pending_investigation" = "final") => {
     if (!patient.name.trim()) {
       toast({ title: L.enterPatientName, variant: "destructive" }); return;
@@ -2203,9 +2305,17 @@ export default function NewPrescriptionPage() {
       patient.hb && `Hb: ${patient.hb}`,
       patient.sugar && `Sugar: ${patient.sugar}`,
     ].filter(Boolean).join("  |  ");
+    const enteredOldPatientFee = Number(oldPatientFee);
+    const savedConsultationFee = oldPatient && oldPatientFee.trim() && Number.isFinite(enteredOldPatientFee)
+      ? enteredOldPatientFee
+      : profileConsultationFee;
     const payload = {
       doctorId: doctor?.id ?? 0,
       status,
+      appointmentId: loadedApptId ?? undefined,
+      oldPatient,
+      freePatient,
+      consultationFee: freePatient ? 0 : savedConsultationFee,
       patientName: patient.name,
       patientAge: patient.age ? Number(patient.age) : undefined,
       patientGender: patient.sex === "M" ? "Male" : patient.sex === "F" ? "Female" : "Other",
@@ -2307,6 +2417,8 @@ export default function NewPrescriptionPage() {
       status: "draft",
       createdAt: new Date().toISOString(),
       doctorName: doctor?.name ?? null,
+       oldPatient,
+       consultationFee: savedConsultationFee,
       patientName: patient.name,
       patientPhone: patient.phone || null,
       patientAge: patient.age ? Number(patient.age) : null,
@@ -2364,6 +2476,9 @@ export default function NewPrescriptionPage() {
     setTreatmentNote("");
     setFollowUpDate("");
     setDiagnosis("");
+    setOldPatient(false);
+    setFreePatient(false);
+    setOldPatientFee(doctor?.consultationFee != null ? String(doctor.consultationFee) : "");
     setLoc("/doctor/new-prescription");
     // Auto-load the next patient that was staged when the queue advanced.
     const next = pendingNext;
@@ -2487,14 +2602,14 @@ export default function NewPrescriptionPage() {
     <div className="rx-shell rx-reference-mode min-h-screen min-w-0 flex flex-col bg-background overflow-x-hidden">
 
       {/* ══ REFERENCE-STYLE HEADER ═════════════════════════════════════ */}
-      <header className="rx-topbar rx-reference-header min-w-0 shrink-0 border-b bg-background px-3 py-2 print:hidden relative">
+       <header className="rx-topbar rx-reference-header min-w-0 shrink-0 border-b px-3 py-2 print:hidden relative">
         <div className="rx-doctor-identity rx-doctor-identity-left min-w-0">
           <div className="rx-screen-doctor-brand">
             <div className="min-w-0">
-              <p className="rx-screen-doctor-name text-base font-bold text-blue-800 dark:text-blue-300">{screenHName}</p>
-              <p className="text-[11px] text-foreground">{screenHDegree || "M.B.B.S."}</p>
-              <p className="text-[11px] text-muted-foreground">{screenHDesignation || doctor?.specialtyName || "Medical Specialist"}</p>
-              {screenHBmdc && <p className="text-[11px] text-muted-foreground">BMDC: {screenHBmdc}</p>}
+               <p className="rx-screen-doctor-name text-base font-bold">{screenHName}</p>
+               <p className="text-[11px]">{screenHDegree || "M.B.B.S."}</p>
+               <p className="text-[11px]">{screenHDesignation || doctor?.specialtyName || "Medical Specialist"}</p>
+               {screenHBmdc && <p className="text-[11px]">BMDC: {screenHBmdc}</p>}
             </div>
           </div>
         </div>
@@ -2511,10 +2626,10 @@ export default function NewPrescriptionPage() {
 
         <div className="rx-doctor-identity rx-doctor-identity-right min-w-0 text-right">
           <p className="rx-screen-clinic-label">{isBn ? "চেম্বার ও যোগাযোগ" : "CHAMBER & CONTACT"}</p>
-          {screenHHospital && <p className="font-semibold text-foreground">{screenHHospital}</p>}
-          {screenHAddress && <p className="text-[11px] text-muted-foreground">{screenHAddress}</p>}
-          {screenHPhone && <p className="text-[11px] text-muted-foreground">{screenHPhone}</p>}
-          {screenHEmail && <p className="text-[11px] text-muted-foreground">{screenHEmail}</p>}
+           {screenHHospital && <p className="font-semibold">{screenHHospital}</p>}
+           {screenHAddress && <p className="text-[11px]">{screenHAddress}</p>}
+           {screenHPhone && <p className="text-[11px]">{screenHPhone}</p>}
+           {screenHEmail && <p className="text-[11px]">{screenHEmail}</p>}
         </div>
         <div className="rx-reference-patient-summary grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]">
           <div className="min-w-0">
@@ -2588,7 +2703,7 @@ export default function NewPrescriptionPage() {
          <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"} onClick={toggleTheme}>
            {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
          </Button>
-         <Button variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs gap-1" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${patient.name || "Patient"} — ${diagnosis || L.diagnosisDx}`)}`, "_blank", "noopener,noreferrer")}>
+          <Button variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs gap-1" onClick={sharePrescription}>
            Share
          </Button>
        </div>
@@ -3495,7 +3610,7 @@ export default function NewPrescriptionPage() {
 
               <button
                 type="button"
-                className="rx-reference-add-medicine inline-flex items-center gap-1.5 rounded-md border border-teal-600 bg-white px-3 py-1.5 text-sm font-bold text-teal-700 shadow-sm transition-colors hover:bg-teal-50 dark:bg-card dark:text-teal-300"
+                className="rx-reference-add-medicine inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-bold shadow-sm transition-colors"
                 onClick={() => {
                   setShowMedicineComposer(true);
                   window.setTimeout(() => medInputRef.current?.focus(), 0);
@@ -3617,7 +3732,7 @@ export default function NewPrescriptionPage() {
                 <Button variant="outline" className="w-full min-w-0 sm:flex-1" onClick={() => handleSave(false, "draft")} disabled={createRx.isPending || updateRx.isPending}>
                   <Save className="h-4 w-4 mr-2" />{saveDraftLabel}
                 </Button>
-                <Button type="button" variant="outline" className="w-full min-w-0 sm:flex-1" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${patient.name || "Patient"} — ${diagnosis || L.diagnosisDx}`)}`, "_blank", "noopener,noreferrer")}>
+                 <Button type="button" variant="outline" className="w-full min-w-0 sm:flex-1" onClick={sharePrescription}>
                   Share
                 </Button>
               </div>
@@ -3628,12 +3743,31 @@ export default function NewPrescriptionPage() {
                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-teal-800 dark:text-teal-200">
                      <TrendingUp className="h-3.5 w-3.5" />
                      <span>{L.consultationSummary}</span>
-                   </div>                   <div className="flex flex-wrap items-center gap-2">
-                     {consultationFeeLabel && (
-                       <span className="text-[10px] font-medium text-muted-foreground">
-                         {isBn ? "প্রোফাইল ফি" : "Profile fee"}: {consultationFeeLabel}
-                       </span>
-                     )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="flex items-center gap-1.5 text-[10px] font-semibold text-foreground">
+                        <input type="checkbox" checked={oldPatient} onChange={event => setOldPatient(event.target.checked)} disabled={freePatient} className="h-3.5 w-3.5 accent-teal-600" />
+                        {L.oldPatient}
+                      </label>
+                      <label className="flex items-center gap-1.5 text-[10px] font-semibold text-foreground">
+                        <input type="checkbox" checked={freePatient} onChange={event => {
+                          const checked = event.target.checked;
+                          setFreePatient(checked);
+                          if (checked) setOldPatientFee("0");
+                        }} className="h-3.5 w-3.5 accent-amber-600" />
+                        {isBn ? "ফ্রি রোগী" : "Free Patient"}
+                      </label>
+                      {oldPatient ? (
+                        <label className="flex items-center gap-1 text-[10px] font-medium text-foreground">
+                          <span>{L.oldPatientFee}</span>
+                          <span className="text-muted-foreground">{consultationCurrencySymbol}</span>
+                          <Input type="number" min="0" step="1" className="h-7 w-20 px-1.5 text-[10px]" value={oldPatientFee} onChange={event => setOldPatientFee(event.target.value)} aria-label={L.oldPatientFee} />
+                        </label>
+                      ) : (
+                        <span className="text-[10px] font-medium text-muted-foreground">
+                          {L.normalPatientFee}: {consultationCurrencySymbol}{profileConsultationFee}
+                        </span>
+                      )}
                      <label className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
                        <span>{isBn ? "সময়কাল" : "Period"}:</span>
                        <select
@@ -3650,30 +3784,27 @@ export default function NewPrescriptionPage() {
                      </label>
                    </div>
                  </div>
-                 <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6">
+                 <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
                    <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
-                     <span className="block truncate text-[10px] text-muted-foreground">{L.dailyPatients}</span>
-                     <strong className="mt-0.5 block text-sm text-foreground">{qCompleted}</strong>
+                     <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "রোগী" : "Patients"}</span>
+                     <strong className="mt-0.5 block text-sm text-foreground">{selectedConsultationStats.patients}</strong>
                    </div>
                    <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
-                     <span className="block truncate text-[10px] text-muted-foreground">{L.dailyEarnings}</span>
-                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{L.unavailable}</strong>
+                     <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "আয়" : "Earnings"}</span>
+                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{consultationCurrencySymbol}{selectedConsultationStats.earnings}</strong>
                    </div>
                    <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
-                     <span className="block truncate text-[10px] text-muted-foreground">{L.dailyFreePatients}</span>
-                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{L.unavailable}</strong>
+                     <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "ফ্রি রোগী" : "Free Patients"}</span>
+                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{selectedConsultationStats.freePatients}</strong>
                    </div>
-                   <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
-                     <span className="block truncate text-[10px] text-muted-foreground">{L.weeklyEarnings}</span>
-                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{L.unavailable}</strong>
-                   </div>
-                   <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
-                     <span className="block truncate text-[10px] text-muted-foreground">{L.monthlyEarnings}</span>
-                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{L.unavailable}</strong>
-                   </div>
-                   <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
-                     <span className="block truncate text-[10px] text-muted-foreground">{L.totalEarnings}</span>
-                     <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{L.unavailable}</strong>
+                   <div className="col-span-3 hidden min-w-0 rounded-lg border bg-background px-2 py-1.5 sm:block">
+                     <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "নির্বাচিত সময়ের সারসংক্ষেপ" : "Selected Period Summary"}</span>
+                     <strong className="mt-0.5 block text-sm text-foreground">
+                       {consultationPeriod === "today" ? (isBn ? "আজ" : "Today") :
+                        consultationPeriod === "week" ? (isBn ? "এই সপ্তাহ" : "This Week") :
+                        consultationPeriod === "month" ? (isBn ? "এই মাস" : "This Month") :
+                        (isBn ? "সব সময়" : "All Time")}
+                     </strong>
                    </div>
                  </div>
                  <p className="mt-2 text-[10px] leading-4 text-muted-foreground">{L.earningsDataNote}</p>

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -8,6 +8,9 @@ export const prescriptionsTable = pgTable("prescriptions", {
   status: text("status").notNull().default("final"),
   doctorId: integer("doctor_id").notNull(),
   appointmentId: integer("appointment_id"),
+  oldPatient: boolean("old_patient").notNull().default(false),
+  freePatient: boolean("free_patient").notNull().default(false),
+  consultationFee: integer("consultation_fee"),
   patientName: text("patient_name").notNull(),
   patientPhone: text("patient_phone"),
   patientAge: integer("patient_age"),
