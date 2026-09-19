@@ -58,6 +58,7 @@ const IX_CHIPS = ["CBC","Urine R/E","Blood Sugar (F)","Blood Sugar (R)","HbA1c",
 
 interface MedItem {
   id: string;
+  medicineId?: number | null;
   brandName: string; genericName: string;
   strength: string; dosageForm: string;
   dose: string; durationNum: string; durationUnit: "D" | "W" | "M";
@@ -1418,7 +1419,7 @@ export default function NewPrescriptionPage() {
     suppressNextSearchRef.current = true;
     setSelectedMedicineId(s.id);
     setSaveMedicineToDb(false);
-    setCurrentMed(m => ({ ...m, brandName: s.brandName, genericName: s.genericName ?? "", strength: s.strength ?? "", dosageForm: s.dosageForm ?? "" }));
+    setCurrentMed(m => ({ ...m, medicineId: s.id, brandName: s.brandName, genericName: s.genericName ?? "", strength: s.strength ?? "", dosageForm: s.dosageForm ?? "" }));
     setShowSug(false);
     setMedSug([]);
     setActiveMedSugIndex(-1);
@@ -1465,9 +1466,10 @@ export default function NewPrescriptionPage() {
       toast({ title: isBn ? "ব্র্যান্ড নাম প্রয়োজন" : "Brand name is required to save in DB", variant: "destructive" });
       return;
     }
+    let medicineId = currentMed.medicineId;
     if (saveMedicineToDb) {
       try {
-        await createMedicine.mutateAsync({
+        const createdMedicine = await createMedicine.mutateAsync({
           data: {
             brandName: currentMed.brandName.trim(),
             genericName: currentMed.genericName.trim() || undefined,
@@ -1475,13 +1477,15 @@ export default function NewPrescriptionPage() {
             dosageForm: currentMed.dosageForm.trim() || undefined,
           },
         });
+        medicineId = createdMedicine.id;
         toast({ title: isBn ? "ডাটাবেসে সংরক্ষিত হয়েছে" : "Medicine saved in DB" });
       } catch {
         toast({ title: isBn ? "ডাটাবেসে সংরক্ষণ করা যায়নি" : "Could not save medicine in DB", variant: "destructive" });
       }
     }
-    recordMedicineShortcut(currentMed);
-    setMedicines(m => [...m, { ...currentMed, id: crypto.randomUUID() }]);
+    const medicineToAdd = { ...currentMed, medicineId };
+    recordMedicineShortcut(medicineToAdd);
+    setMedicines(m => [...m, { ...medicineToAdd, id: crypto.randomUUID() }]);
     setCurrentMed(emptyMed());
     setSaveMedicineToDb(false);
     setSelectedMedicineId(null);
@@ -2071,6 +2075,7 @@ export default function NewPrescriptionPage() {
       const isWeek = /সপ্তাহ|week/i.test(dur);
       return {
         id: crypto.randomUUID(),
+        medicineId: it.medicineId ?? undefined,
         brandName: it.medicineName ?? "",
         genericName: it.genericName ?? "",
         strength: it.strength ?? "",
@@ -2214,6 +2219,7 @@ export default function NewPrescriptionPage() {
       followUpDate: followUpDate || undefined,
       notes: treatmentNote || undefined,
       items: medicines.map(m => ({
+        medicineId: m.medicineId ?? undefined,
         medicineName: m.brandName || m.genericName,
         genericName: m.genericName || undefined,
         strength: m.strength || undefined,
