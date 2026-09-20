@@ -1170,6 +1170,10 @@ export default function NewPrescriptionPage() {
   const [freePatient, setFreePatient] = useState(false);
   const consultationCurrencySymbol = doctor?.currency === "USD" ? "$" : "৳";
   const profileConsultationFee = doctor?.consultationFee ?? 0;
+  const enteredOldPatientFee = Number(oldPatientFee);
+  const savedConsultationFee = oldPatient && oldPatientFee.trim() && Number.isFinite(enteredOldPatientFee)
+    ? enteredOldPatientFee
+    : profileConsultationFee;
 
   const consultationStats = useMemo(() => {
     const currentDate = toLocalDateStr(new Date());
@@ -2267,7 +2271,11 @@ export default function NewPrescriptionPage() {
       patient.phone ? `Mobile: ${patient.phone}` : "",
       patient.address ? `Address: ${patient.address}` : "",
       `Date: ${patient.date || toLocalDateStr(new Date())}`,
-      oldPatient ? `Patient type: Old Patient (${consultationCurrencySymbol}${oldPatientFee || profileConsultationFee})` : `Consultation fee: ${consultationCurrencySymbol}${profileConsultationFee}`,
+      freePatient
+        ? `Patient type: Free Patient (${consultationCurrencySymbol}0)`
+        : oldPatient
+          ? `Patient type: Old Patient (${consultationCurrencySymbol}${savedConsultationFee})`
+          : `Consultation fee: ${consultationCurrencySymbol}${profileConsultationFee}`,
       patient.cc ? `Chief complaint: ${patient.cc}` : "",
       patient.oe ? `Examination: ${patient.oe}` : "",
       patient.drugHistory ? `Drug history: ${patient.drugHistory}` : "",
@@ -2305,10 +2313,6 @@ export default function NewPrescriptionPage() {
       patient.hb && `Hb: ${patient.hb}`,
       patient.sugar && `Sugar: ${patient.sugar}`,
     ].filter(Boolean).join("  |  ");
-    const enteredOldPatientFee = Number(oldPatientFee);
-    const savedConsultationFee = oldPatient && oldPatientFee.trim() && Number.isFinite(enteredOldPatientFee)
-      ? enteredOldPatientFee
-      : profileConsultationFee;
     const payload = {
       doctorId: doctor?.id ?? 0,
       status,
@@ -2417,8 +2421,9 @@ export default function NewPrescriptionPage() {
       status: "draft",
       createdAt: new Date().toISOString(),
       doctorName: doctor?.name ?? null,
-       oldPatient,
-       consultationFee: savedConsultationFee,
+      oldPatient,
+      freePatient,
+      consultationFee: freePatient ? 0 : savedConsultationFee,
       patientName: patient.name,
       patientPhone: patient.phone || null,
       patientAge: patient.age ? Number(patient.age) : null,
@@ -2428,6 +2433,7 @@ export default function NewPrescriptionPage() {
       vitals: vitalsStr || null,
       chiefComplaint: patient.cc || null,
       examination: patient.oe || null,
+      drugHistory: patient.drugHistory || null,
       diagnosis: diagnosis || null,
       investigations: allIx || null,
       advice: advice || null,

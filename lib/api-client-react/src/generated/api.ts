@@ -285,7 +285,7 @@ export const login = async (loginInput: LoginInput, options?: Parameters<typeof 
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -373,7 +373,7 @@ export const verifyLoginOtp = async (verifyLoginOtpInput: VerifyLoginOtpInput, o
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -461,7 +461,7 @@ export const resendLoginOtp = async (resendLoginOtpInput: ResendLoginOtpInput, o
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -700,7 +700,7 @@ export const registerPatient = async (registerInput: RegisterInput, options?: Pa
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -788,7 +788,7 @@ export const forgotPassword = async (forgotPasswordInput: ForgotPasswordInput, o
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -876,7 +876,7 @@ export const resetPassword = async (resetPasswordInput: ResetPasswordInput, opti
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -964,7 +964,7 @@ export const changePassword = async (changePasswordInput: ChangePasswordInput, o
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1052,7 +1052,7 @@ export const adminResetPassword = async (adminResetPasswordInput: AdminResetPass
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1224,7 +1224,7 @@ export const createShopProduct = async (shopProductInput: ShopProductInput, opti
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1390,7 +1390,7 @@ export const updateShopProduct = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1629,7 +1629,7 @@ export const addToCart = async (cartInput: CartInput, options?: Parameters<typeo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1718,7 +1718,7 @@ export const updateCartItem = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2031,7 +2031,7 @@ export const placeOrder = async (placeOrderInput: PlaceOrderInput, options?: Par
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2274,7 +2274,7 @@ export const updateOrderStatus = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2439,7 +2439,7 @@ export const createDepartment = async (departmentInput: DepartmentInput, options
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2528,7 +2528,7 @@ export const updateDepartment = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2774,7 +2774,7 @@ export const createSpecialty = async (specialtyInput: SpecialtyInput, options?: 
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3013,7 +3013,7 @@ export const createLocation = async (locationInput: LocationInput, options?: Par
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3259,7 +3259,7 @@ export const registerDoctor = async (doctorRegistrationInput: DoctorRegistration
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3425,7 +3425,7 @@ export const updateDoctor = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3662,7 +3662,7 @@ export const featureDoctor = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3751,7 +3751,7 @@ export const markSeniorDoctor = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -4077,7 +4077,7 @@ export const createAppointment = async (appointmentInput: AppointmentInput, opti
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -4243,7 +4243,7 @@ export const updateAppointment = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -4566,7 +4566,7 @@ export const createAssistant = async (assistantInput: AssistantInput, options?: 
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -4729,7 +4729,7 @@ export const resetAssistantPassword = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -5439,7 +5439,7 @@ export const createPrescription = async (prescriptionInput: PrescriptionInput, o
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -5605,7 +5605,7 @@ export const updatePrescription = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -5847,7 +5847,7 @@ export const updateMyRxSettings = async (doctorRxSettingsInput: DoctorRxSettings
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6089,7 +6089,7 @@ export const updateAppSettings = async (appSettingsInput: AppSettingsInput, opti
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6261,7 +6261,7 @@ export const createMedicine = async (medicineInput: MedicineInput, options?: Par
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6350,7 +6350,7 @@ export const updateMedicine = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6596,7 +6596,7 @@ export const paySubscription = async (subscriptionPayInput: SubscriptionPayInput
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6685,7 +6685,7 @@ export const updateSubscription = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6774,7 +6774,7 @@ export const renewSubscription = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -6946,7 +6946,7 @@ export const createBanner = async (bannerInput: BannerInput, options?: Parameter
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -7035,7 +7035,7 @@ export const updateBanner = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -7281,7 +7281,7 @@ export const createSlider = async (sliderInput: SliderInput, options?: Parameter
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -7370,7 +7370,7 @@ export const updateSlider = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -7616,7 +7616,7 @@ export const createVideoPromotion = async (videoPromotionInput: VideoPromotionIn
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -7705,7 +7705,7 @@ export const updateVideoPromotion = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -7951,7 +7951,7 @@ export const createBlogPost = async (blogPostInput: BlogPostInput, options?: Par
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -8117,7 +8117,7 @@ export const updateBlogPost = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -8440,7 +8440,7 @@ export const createMenuItem = async (menuItemInput: MenuItemInput, options?: Par
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -8529,7 +8529,7 @@ export const updateMenuItem = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -8852,7 +8852,7 @@ export const createAdvertisement = async (advertisementInput: AdvertisementInput
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -8941,7 +8941,7 @@ export const updateAdvertisement = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -9181,7 +9181,7 @@ export const updateAdsenseSlot = async (position: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -9346,7 +9346,7 @@ export const updateAdminSettings = async (adminSettingsInput: AdminSettingsInput
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -9434,7 +9434,7 @@ export const payDoctorSubscriptionSslcommerz = async (payDoctorSubscriptionSslco
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -9751,7 +9751,7 @@ export const updatePaymentGateway = async (gateway: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -10168,7 +10168,7 @@ export const importMigration = async (migrationImportInput: MigrationImportInput
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -10652,7 +10652,7 @@ export const createCountry = async (countryInput: CountryInput, options?: Parame
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -10901,7 +10901,7 @@ export const updateDoctorStatus = async (doctorStatusInput: DoctorStatusInput, o
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -11143,7 +11143,7 @@ export const createNotice = async (doctorNoticeInput: DoctorNoticeInput, options
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -11232,7 +11232,7 @@ export const updateNotice = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -11548,7 +11548,7 @@ export const upsertAvailability = async (doctorAvailabilityInput: DoctorAvailabi
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -12240,7 +12240,7 @@ export const createConversation = async (createConversationInput: CreateConversa
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -12418,7 +12418,7 @@ export const sendMessage = async (conversationId: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -12805,7 +12805,7 @@ export const submitReview = async (reviewInput: ReviewInput, options?: Parameter
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -13442,7 +13442,7 @@ export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, optio
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -13766,7 +13766,7 @@ export const updateQueueDevice = async (id: number,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -14005,7 +14005,7 @@ export const createQueueDevice = async (queueDisplayDeviceInput: QueueDisplayDev
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return (() => { const o: Record<string, string> = {}; h.forEach((value, key) => { o[key] = value; }); return o; })();
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
