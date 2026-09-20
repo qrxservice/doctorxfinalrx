@@ -2042,3 +2042,94 @@
     flex: 1 1 auto;
   }
 }
+
+/* === DoctorX header color correction ===
+   Prescription header keeps its original theme.
+   Only top action menu + Add Medicine header use green.
+*/
+
+/* Prescription header — restore original existing theme */
+.rx-reference-mode .rx-reference-header {
+  background: var(--rx-reference-header-bg);
+  color: var(--rx-reference-header-ink);
+}
+
+.rx-reference-mode .rx-reference-header .text-muted-foreground {
+  color: var(--rx-reference-header-muted);
+}
+
+.rx-reference-mode .rx-reference-header .rx-screen-clinic-label,
+.rx-reference-mode .rx-reference-header .rx-screen-doctor-name {
+  color: var(--rx-reference-header-ink);
+}
+
+.rx-reference-mode .rx-reference-header .rx-reference-patient-summary {
+  color: var(--rx-reference-header-ink);
+}
+
+/* Top header action menu — green with high-contrast controls */
+.rx-reference-mode .rx-reference-toolbar {
+  background: #087f5b;
+  color: #ffffff;
+}
+
+.rx-reference-mode .rx-reference-toolbar button {
+  color: #ffffff !important;
+}
+
+.rx-reference-mode .rx-reference-toolbar button svg {
+  color: currentColor !important;
+}
+
+.rx-reference-mode .rx-reference-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff !important;
+}
+
+/* Add Medicine header only — green */
+.rx-reference-mode .rx-medicine-entry-header {
+  background: #087f5b;
+  color: #ffffff;
+  border-bottom-color: #087f5b;
+}
+
+.rx-reference-mode .rx-medicine-entry-header .rx-symbol,
+.rx-reference-mode .rx-medicine-entry-header h2,
+.rx-reference-mode .rx-medicine-entry-header h2 span {
+  color: #ffffff;
+}
+
+/* Dark mode — prescription header stays on its original dark theme */
+.dark .rx-reference-mode .rx-reference-header {
+  background: var(--rx-reference-header-bg);
+  color: var(--rx-reference-header-ink);
+}
+
+.dark .rx-reference-mode .rx-reference-header .rx-screen-clinic-label,
+.dark .rx-reference-mode .rx-reference-header .rx-screen-doctor-name {
+  color: var(--rx-reference-header-ink);
+}
+
+/* Dark mode — top menu remains green and readable */
+.dark .rx-reference-mode .rx-reference-toolbar {
+  background: #075d43;
+  color: #ffffff;
+}
+
+.dark .rx-reference-mode .rx-reference-toolbar button,
+.dark .rx-reference-mode .rx-reference-toolbar button svg {
+  color: #ffffff !important;
+}
+
+/* Dark mode — Add Medicine stays green, not dark gradient */
+.dark .rx-reference-mode .rx-medicine-entry-header {
+  background: #075d43;
+  color: #ffffff;
+  border-bottom-color: #0b7655;
+}
+
+.dark .rx-reference-mode .rx-medicine-entry-header .rx-symbol,
+.dark .rx-reference-mode .rx-medicine-entry-header h2,
+.dark .rx-reference-mode .rx-medicine-entry-header h2 span {
+  color: #ffffff;
+}
