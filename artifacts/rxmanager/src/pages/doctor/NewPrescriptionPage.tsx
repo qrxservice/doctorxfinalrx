@@ -2639,23 +2639,23 @@ export default function NewPrescriptionPage() {
             </span>
           </div>
           <div className="rx-queue-inline-stats">
-            <div>
-              <span>{L.nowServingShort}</span>
-              <strong>{queueServing ? `#${queueServing.serialNo}` : "—"}</strong>
+            <div className={cn(isOnBreak && "rx-queue-break-inline")}>
+              <span>{isOnBreak ? L.breakActive : L.nowServingShort}</span>
+              <strong>
+                {isOnBreak ? (
+                  <>
+                    <Timer className="h-3.5 w-3.5" />
+                    {breakCdStr ?? "00:00:00"}
+                  </>
+                ) : (
+                  queueServing ? `#${queueServing.serialNo}` : "—"
+                )}
+              </strong>
             </div>
             <div><span>{L.totalAppts}</span><strong>{qTotalToday}</strong></div>
             <div><span>{L.waitingShort}</span><strong>{queueWaiting.length}</strong></div>
             <div><span>{isBn ? "পরামর্শ চলছে" : "In Consultation"}</span><strong>{queueServing ? 1 : 0}</strong></div>
             <div><span>{L.completedCount}</span><strong>{qCompleted}</strong></div>
-            {isOnBreak && (
-              <div className="rx-queue-break-inline">
-                <span>{L.breakActive}</span>
-                <strong>
-                  <Timer className="h-3 w-3" />
-                  {breakCdStr ?? "00:00:00"}
-                </strong>
-              </div>
-            )}
           </div>
         </div>
 
@@ -2713,7 +2713,7 @@ export default function NewPrescriptionPage() {
            <Plus className="h-3.5 w-3.5" />{L.navNewRx}
          </Button>
          <NavBtn href="/doctor/dashboard" icon={<LayoutDashboard className="h-3 w-3" />} label={L.navDashboard} />
-          <NavBtn href="/doctor/prescriptions" icon={<ClipboardList className="h-3 w-3" />} label="Prescription Management" />
+          <NavBtn href="/doctor/prescriptions" icon={<ClipboardList className="h-3 w-3" />} label="RX Manager" />
           <Button type="button" variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs gap-1" onClick={() => handleMobileAction(() => setShowHeaderDlg(true))}>
            <Settings2 className="h-3.5 w-3.5" /><span>{L.headerSettings}</span>
          </Button>
@@ -3735,7 +3735,7 @@ export default function NewPrescriptionPage() {
                      <div className="flex flex-wrap gap-1">
                        {(templates["advice"] ?? []).map(t => (
                          <button key={`advice-chip-${t.id}`} type="button" onClick={() => applyTemplate(t)}
-                           className="text-xs px-2 py-1 rounded border bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition-colors">
+                           className="rx-clinical-template-btn text-xs px-2 py-1 rounded border transition-colors">
                            {t.title}
                          </button>
                        ))}
@@ -3776,7 +3776,7 @@ export default function NewPrescriptionPage() {
                   <div className="flex flex-wrap gap-1">
                     {(templates["protocol"] ?? []).map(t => (
                       <button key={t.id} type="button" onClick={() => applyTemplate(t)}
-                        className="text-[9px] px-1.5 py-0.5 rounded border bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition-colors">
+                        className="rx-clinical-template-btn text-[9px] px-1.5 py-0.5 rounded border transition-colors">
                         Template · {t.title}
                       </button>
                     ))}

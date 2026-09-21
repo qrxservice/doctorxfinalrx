@@ -2519,3 +2519,309 @@
     font-size: .7rem;
   }
 }
+
+/* === FINAL prescription outlook refinement === */
+
+/* Queue Summary: one horizontal row, larger/readable clinical typography */
+.rx-reference-mode .rx-queue-summary-inline {
+  min-width: 0;
+}
+
+.rx-reference-mode .rx-queue-summary-inline-title {
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  line-height: 1.15;
+}
+
+.rx-reference-mode .rx-queue-inline-stats {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(5.5rem, 1fr)) !important;
+  align-items: stretch;
+  width: 100%;
+}
+
+.rx-reference-mode .rx-queue-inline-stats > div {
+  min-width: 0;
+}
+
+.rx-reference-mode .rx-queue-inline-stats > div > span {
+  font-size: .68rem !important;
+  font-weight: 600 !important;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.rx-reference-mode .rx-queue-inline-stats > div > strong {
+  font-size: .9rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+}
+
+.rx-reference-mode .rx-queue-break-inline > span {
+  color: #8a5800 !important;
+}
+
+.rx-reference-mode .rx-queue-break-inline > strong {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
+  color: #a65300 !important;
+  font-size: .9rem !important;
+  font-weight: 800 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.dark .rx-reference-mode .rx-queue-break-inline > span,
+.dark .rx-reference-mode .rx-queue-break-inline > strong {
+  color: #fbbf24 !important;
+}
+
+/*
+ * Advice / Treatment Note / Follow-up:
+ * one professional surface family instead of mixed colored boxes.
+ */
+.rx-reference-mode .rx-prescription-section,
+.rx-reference-mode .rx-advice-section,
+.rx-reference-mode .rx-treatment-note-section,
+.rx-reference-mode .rx-follow-up-section {
+  background: #f7fbfa !important;
+  border-color: #c7dfd6 !important;
+  color: #263b40 !important;
+}
+
+/* Keep all controls in the same light prescription surface family. */
+.rx-reference-mode .rx-advice-section textarea,
+.rx-reference-mode .rx-treatment-note-section textarea,
+.rx-reference-mode .rx-follow-up-section input,
+.rx-reference-mode .rx-follow-up-section textarea,
+.rx-reference-mode .rx-follow-up-section button,
+.rx-reference-mode .rx-follow-up-section [role="combobox"] {
+  background: #f7fbfa !important;
+  color: #263b40 !important;
+  border-color: #c7dfd6 !important;
+}
+
+/* Remove purple/orange template appearance; use restrained clinical text. */
+.rx-reference-mode .rx-advice-section button,
+.rx-reference-mode .rx-treatment-note-section button {
+  color: #334b50 !important;
+  border-color: #c7dfd6 !important;
+}
+
+.rx-reference-mode .rx-advice-section button:not([disabled]),
+.rx-reference-mode .rx-treatment-note-section button:not([disabled]) {
+  background: #f7fbfa !important;
+}
+
+.rx-reference-mode .rx-advice-section button:hover,
+.rx-reference-mode .rx-treatment-note-section button:hover,
+.rx-reference-mode .rx-follow-up-section button:hover {
+  background: #edf6f4 !important;
+  color: #17353d !important;
+}
+
+/* Dark mode uses one matching dark surface family. */
+.dark .rx-reference-mode .rx-prescription-section,
+.dark .rx-reference-mode .rx-advice-section,
+.dark .rx-reference-mode .rx-treatment-note-section,
+.dark .rx-reference-mode .rx-follow-up-section {
+  background: #16262b !important;
+  border-color: #315057 !important;
+  color: #e4f0f1 !important;
+}
+
+.dark .rx-reference-mode .rx-advice-section textarea,
+.dark .rx-reference-mode .rx-treatment-note-section textarea,
+.dark .rx-reference-mode .rx-follow-up-section input,
+.dark .rx-reference-mode .rx-follow-up-section textarea,
+.dark .rx-reference-mode .rx-follow-up-section button,
+.dark .rx-reference-mode .rx-follow-up-section [role="combobox"],
+.dark .rx-reference-mode .rx-advice-section button,
+.dark .rx-reference-mode .rx-treatment-note-section button {
+  background: #16262b !important;
+  color: #dbe9eb !important;
+  border-color: #315057 !important;
+}
+
+.dark .rx-reference-mode .rx-advice-section button:hover,
+.dark .rx-reference-mode .rx-treatment-note-section button:hover,
+.dark .rx-reference-mode .rx-follow-up-section button:hover {
+  background: #20363c !important;
+  color: #ffffff !important;
+}
+
+/* Preserve compact responsive behavior without creating a sixth queue column. */
+@media (max-width: 640px) {
+  .rx-reference-mode .rx-queue-inline-stats {
+    grid-template-columns: repeat(5, minmax(4.4rem, 1fr)) !important;
+  }
+
+  .rx-reference-mode .rx-queue-inline-stats > div > span {
+    font-size: .6rem !important;
+  }
+
+  .rx-reference-mode .rx-queue-inline-stats > div > strong,
+  .rx-reference-mode .rx-queue-break-inline > strong {
+    font-size: .78rem !important;
+  }
+}
+
+/* === Actual prescription lower-section surface correction ===
+   Advice / Treatment Note / Follow-up use one restrained clinical surface. */
+
+.rx-reference-mode .rx-notes-card,
+.rx-reference-mode .rx-followup-card {
+  background: #f7fbfa !important;
+  border-color: #c7dfd6 !important;
+  color: #263b40 !important;
+}
+
+/* Section body must not create a second/different coloured panel. */
+.rx-reference-mode .rx-notes-card .rx-section-body {
+  background: #f7fbfa !important;
+  color: #263b40 !important;
+}
+
+/* Inputs/textareas/selects stay in the same visual family. */
+.rx-reference-mode .rx-notes-card textarea,
+.rx-reference-mode .rx-notes-card input,
+.rx-reference-mode .rx-followup-card input,
+.rx-reference-mode .rx-followup-card select {
+  background: #f7fbfa !important;
+  border-color: #c7dfd6 !important;
+  color: #263b40 !important;
+}
+
+/* Professional neutral template buttons — no purple/orange text. */
+.rx-reference-mode .rx-clinical-template-btn,
+.rx-reference-mode .rx-notes-card .rx-section-body button:not(.rx-section-toggle) {
+  background: #f7fbfa !important;
+  border-color: #bfd7d1 !important;
+  color: #334b50 !important;
+}
+
+.rx-reference-mode .rx-clinical-template-btn:hover,
+.rx-reference-mode .rx-notes-card .rx-section-body button:not(.rx-section-toggle):hover {
+  background: #edf6f4 !important;
+  border-color: #8fbdb4 !important;
+  color: #17353d !important;
+}
+
+/* Follow-up controls/buttons match the same section surface. */
+.rx-reference-mode .rx-followup-card button {
+  background: #f7fbfa !important;
+  border-color: #bfd7d1 !important;
+  color: #334b50 !important;
+}
+
+.rx-reference-mode .rx-followup-card button:hover {
+  background: #edf6f4 !important;
+  color: #17353d !important;
+}
+
+/* DARK MODE — same principle, one consistent dark surface. */
+.dark .rx-reference-mode .rx-notes-card,
+.dark .rx-reference-mode .rx-followup-card,
+.dark .rx-reference-mode .rx-notes-card .rx-section-body {
+  background: #16262b !important;
+  border-color: #315057 !important;
+  color: #dbe9eb !important;
+}
+
+.dark .rx-reference-mode .rx-notes-card textarea,
+.dark .rx-reference-mode .rx-notes-card input,
+.dark .rx-reference-mode .rx-followup-card input,
+.dark .rx-reference-mode .rx-followup-card select,
+.dark .rx-reference-mode .rx-clinical-template-btn,
+.dark .rx-reference-mode .rx-notes-card .rx-section-body button:not(.rx-section-toggle),
+.dark .rx-reference-mode .rx-followup-card button {
+  background: #16262b !important;
+  border-color: #315057 !important;
+  color: #dbe9eb !important;
+}
+
+.dark .rx-reference-mode .rx-clinical-template-btn:hover,
+.dark .rx-reference-mode .rx-notes-card .rx-section-body button:not(.rx-section-toggle):hover,
+.dark .rx-reference-mode .rx-followup-card button:hover {
+  background: #20363c !important;
+  border-color: #477079 !important;
+  color: #ffffff !important;
+}
+
+/* === FINAL unified Advice / Treatment / Follow-up appearance === */
+
+/* Advice + Treatment: card, body and controls use one continuous surface. */
+.rx-reference-mode .rx-notes-card,
+.rx-reference-mode .rx-notes-card .rx-section-body,
+.rx-reference-mode .rx-notes-card .rx-section-body > div {
+  background-color: #f7fbfa !important;
+  color: #263b40 !important;
+}
+
+.rx-reference-mode .rx-notes-card textarea {
+  background-color: #f7fbfa !important;
+  color: #263b40 !important;
+  border-color: #c7dfd6 !important;
+}
+
+/* Template labels/text use restrained professional slate, not category colors. */
+.rx-reference-mode .rx-notes-card .rx-template-group-label {
+  color: #425b60 !important;
+}
+
+.rx-reference-mode .rx-clinical-template-btn {
+  background-color: #f7fbfa !important;
+  color: #334b50 !important;
+  border-color: #bfd7d1 !important;
+}
+
+.rx-reference-mode .rx-clinical-template-btn:hover {
+  background-color: #edf6f4 !important;
+  color: #17353d !important;
+  border-color: #8fbdb4 !important;
+}
+
+/* Save controls remain identifiable but visually belong to same surface. */
+.rx-reference-mode .rx-notes-card .rx-section-body .inline-flex {
+  border-color: #bfd7d1;
+}
+
+/* Follow-up uses the same exact surface family. */
+.rx-reference-mode .rx-followup-card,
+.rx-reference-mode .rx-followup-card input,
+.rx-reference-mode .rx-followup-card select {
+  background-color: #f7fbfa !important;
+  color: #263b40 !important;
+  border-color: #c7dfd6 !important;
+}
+
+.rx-reference-mode .rx-followup-card label {
+  color: #425b60 !important;
+}
+
+/* DARK: one continuous dark surface, not multiple coloured boxes. */
+.dark .rx-reference-mode .rx-notes-card,
+.dark .rx-reference-mode .rx-notes-card .rx-section-body,
+.dark .rx-reference-mode .rx-notes-card .rx-section-body > div,
+.dark .rx-reference-mode .rx-notes-card textarea,
+.dark .rx-reference-mode .rx-followup-card,
+.dark .rx-reference-mode .rx-followup-card input,
+.dark .rx-reference-mode .rx-followup-card select,
+.dark .rx-reference-mode .rx-clinical-template-btn {
+  background-color: #16262b !important;
+  color: #dbe9eb !important;
+  border-color: #315057 !important;
+}
+
+.dark .rx-reference-mode .rx-notes-card .rx-template-group-label,
+.dark .rx-reference-mode .rx-followup-card label {
+  color: #b9cccf !important;
+}
+
+.dark .rx-reference-mode .rx-clinical-template-btn:hover {
+  background-color: #20363c !important;
+  color: #ffffff !important;
+  border-color: #477079 !important;
+}
