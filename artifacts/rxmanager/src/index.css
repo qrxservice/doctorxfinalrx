@@ -2243,39 +2243,93 @@
   color: #15252a !important;
 }
 
-/* === Light-mode Prescription Header: requested attachment green === */
+/* === Prescription Header: light medical design === */
+
+/* LIGHT MODE:
+   pale green/teal prescription background with subtle medical pattern */
 .rx-reference-mode .rx-reference-header {
-  background: #087f73 !important;
-  color: #ffffff !important;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 24%, rgba(8, 127, 115, 0.10) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 82% 72%, rgba(8, 127, 115, 0.08) 0 2px, transparent 2.5px),
+    linear-gradient(120deg, rgba(8, 127, 115, 0.08) 0%, transparent 34%),
+    linear-gradient(90deg, #f1fbf9 0%, #e7f7f4 50%, #f1fbf9 100%) !important;
+  color: #17353d !important;
+  border-color: rgba(8, 127, 115, 0.28) !important;
 }
 
+/* subtle prescription / medical watermark */
+.rx-reference-mode .rx-reference-header::before {
+  content: "℞";
+  position: absolute;
+  z-index: -1;
+  left: 47%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-10deg);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(5rem, 10vw, 9rem);
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(8, 127, 115, 0.055);
+  pointer-events: none;
+}
+
+.rx-reference-mode .rx-reference-header::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 67%, rgba(8,127,115,.045) 67% 68%, transparent 68%),
+    linear-gradient(65deg, transparent 0 78%, rgba(8,127,115,.04) 78% 79%, transparent 79%);
+  pointer-events: none;
+}
+
+/* Light header text */
 .rx-reference-mode .rx-reference-header .rx-screen-clinic-label,
 .rx-reference-mode .rx-reference-header .rx-screen-doctor-name,
-.rx-reference-mode .rx-reference-header .text-muted-foreground {
-  color: #ffffff !important;
+.rx-reference-mode .rx-reference-header .rx-reference-patient-summary,
+.rx-reference-mode .rx-reference-header .rx-reference-patient-summary *,
+.rx-reference-mode .rx-reference-header .rx-queue-summary-inline-title,
+.rx-reference-mode .rx-reference-header .rx-queue-inline-stats strong {
+  color: #17353d !important;
+}
+
+.rx-reference-mode .rx-reference-header .text-muted-foreground,
+.rx-reference-mode .rx-reference-header .rx-queue-inline-stats span {
+  color: #526a72 !important;
 }
 
 .rx-reference-mode .rx-reference-header .rx-doctor-identity-left p:first-child,
 .rx-reference-mode .rx-reference-header .rx-doctor-identity-right p:first-child {
-  color: #ffffff !important;
+  color: #087f73 !important;
 }
 
-.rx-reference-mode .rx-reference-header .rx-reference-patient-summary,
-.rx-reference-mode .rx-reference-header .rx-reference-patient-summary *,
-.rx-reference-mode .rx-reference-header .rx-queue-summary-inline-title,
-.rx-reference-mode .rx-reference-header .rx-queue-inline-stats span,
-.rx-reference-mode .rx-reference-header .rx-queue-inline-stats strong {
-  color: #ffffff !important;
-}
-
-/* Dark mode Prescription Header: preserve existing dark background */
+/* DARK MODE:
+   preserve existing dark prescription-header design */
 .dark .rx-reference-mode .rx-reference-header {
   background: var(--rx-reference-header-bg) !important;
   color: var(--rx-reference-header-ink) !important;
+  border-color: #27474d !important;
+}
+
+.dark .rx-reference-mode .rx-reference-header::before {
+  color: rgba(142, 217, 232, 0.055);
+}
+
+.dark .rx-reference-mode .rx-reference-header::after {
+  background:
+    linear-gradient(115deg, transparent 0 67%, rgba(142,217,232,.035) 67% 68%, transparent 68%),
+    linear-gradient(65deg, transparent 0 78%, rgba(142,217,232,.03) 78% 79%, transparent 79%);
 }
 
 .dark .rx-reference-mode .rx-reference-header .rx-screen-clinic-label,
-.dark .rx-reference-mode .rx-reference-header .rx-screen-doctor-name {
+.dark .rx-reference-mode .rx-reference-header .rx-screen-doctor-name,
+.dark .rx-reference-mode .rx-reference-header .rx-reference-patient-summary,
+.dark .rx-reference-mode .rx-reference-header .rx-reference-patient-summary *,
+.dark .rx-reference-mode .rx-reference-header .rx-queue-inline-stats strong {
   color: var(--rx-reference-header-ink) !important;
 }
 
@@ -2284,13 +2338,8 @@
   color: var(--rx-reference-header-muted) !important;
 }
 
+.dark .rx-reference-mode .rx-reference-header .rx-queue-summary-inline-title,
 .dark .rx-reference-mode .rx-reference-header .rx-doctor-identity-left p:first-child,
-.dark .rx-reference-mode .rx-reference-header .rx-doctor-identity-right p:first-child,
-.dark .rx-reference-mode .rx-reference-header .rx-queue-summary-inline-title {
+.dark .rx-reference-mode .rx-reference-header .rx-doctor-identity-right p:first-child {
   color: var(--rx-reference-header-accent) !important;
-}
-
-.dark .rx-reference-mode .rx-reference-header .rx-queue-inline-stats strong,
-.dark .rx-reference-mode .rx-reference-header .rx-reference-patient-summary {
-  color: var(--rx-reference-header-ink) !important;
 }
