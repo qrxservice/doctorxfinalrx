@@ -2133,3 +2133,112 @@
 .dark .rx-reference-mode .rx-medicine-entry-header h2 span {
   color: #ffffff;
 }
+
+/* === DoctorX unified green headers + visibility fix === */
+:root {
+  --doctorx-header-green: #087f73;
+  --doctorx-header-green-hover: #076f65;
+}
+
+/* TOP MENU — requested green */
+.rx-reference-mode .rx-reference-toolbar {
+  background: var(--doctorx-header-green) !important;
+  color: #ffffff !important;
+}
+
+/* All normal toolbar buttons */
+.rx-reference-mode .rx-reference-toolbar button,
+.rx-reference-mode .rx-reference-toolbar button span,
+.rx-reference-mode .rx-reference-toolbar button svg {
+  color: #ffffff !important;
+}
+
+/* Dashboard + Prescription Management are Links/NavBtn, not buttons */
+.rx-reference-mode .rx-reference-toolbar-scroll > a,
+.rx-reference-mode .rx-reference-toolbar-scroll > a > span,
+.rx-reference-mode .rx-reference-toolbar-scroll > a svg {
+  color: #ffffff !important;
+}
+
+.rx-reference-mode .rx-reference-toolbar-scroll > a > span:hover,
+.rx-reference-mode .rx-reference-toolbar button:hover {
+  background: rgba(255,255,255,0.15) !important;
+  color: #ffffff !important;
+}
+
+/* Secondary toolbar / Calculator */
+.rx-reference-mode .rx-reference-toolbar-secondary,
+.rx-reference-mode .rx-reference-toolbar-secondary button,
+.rx-reference-mode .rx-reference-toolbar-secondary button span,
+.rx-reference-mode .rx-reference-toolbar-secondary button svg {
+  color: #ffffff !important;
+}
+
+.rx-reference-mode .rx-reference-toolbar-secondary button {
+  border-color: rgba(255,255,255,0.38) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* ADD MEDICINE HEADER — same requested green */
+.rx-reference-mode .rx-medicine-entry-header,
+.dark .rx-reference-mode .rx-medicine-entry-header {
+  background: var(--doctorx-header-green) !important;
+  color: #ffffff !important;
+  border-bottom-color: var(--doctorx-header-green) !important;
+}
+
+.rx-reference-mode .rx-medicine-entry-header .rx-symbol,
+.rx-reference-mode .rx-medicine-entry-header h2,
+.rx-reference-mode .rx-medicine-entry-header h2 span,
+.dark .rx-reference-mode .rx-medicine-entry-header .rx-symbol,
+.dark .rx-reference-mode .rx-medicine-entry-header h2,
+.dark .rx-reference-mode .rx-medicine-entry-header h2 span {
+  color: #ffffff !important;
+}
+
+/* PRINT PREVIEW PRESCRIPTION HEADER — same requested green */
+.rx-print-preview .rx-print-header,
+.dark .rx-print-preview .rx-print-header {
+  background: var(--doctorx-header-green) !important;
+  color: #ffffff !important;
+  border-bottom-color: var(--doctorx-header-green) !important;
+}
+
+/* Keep every print-header text readable in both app themes */
+.rx-print-preview .rx-print-header h1,
+.rx-print-preview .rx-print-header p,
+.rx-print-preview .rx-print-header .text-white,
+.rx-print-preview .rx-print-header .text-teal-100,
+.rx-print-preview .rx-print-header .text-teal-200,
+.rx-print-preview .rx-print-contact,
+.dark .rx-print-preview .rx-print-header h1,
+.dark .rx-print-preview .rx-print-header p,
+.dark .rx-print-preview .rx-print-contact {
+  color: #ffffff !important;
+}
+
+/* Dark mode: top menu uses SAME requested green, text remains visible */
+.dark .rx-reference-mode .rx-reference-toolbar {
+  background: var(--doctorx-header-green) !important;
+  color: #ffffff !important;
+}
+
+.dark .rx-reference-mode .rx-reference-toolbar button,
+.dark .rx-reference-mode .rx-reference-toolbar button span,
+.dark .rx-reference-mode .rx-reference-toolbar button svg,
+.dark .rx-reference-mode .rx-reference-toolbar-scroll > a,
+.dark .rx-reference-mode .rx-reference-toolbar-scroll > a > span,
+.dark .rx-reference-mode .rx-reference-toolbar-scroll > a svg {
+  color: #ffffff !important;
+}
+
+/* Disabled actions remain readable */
+.rx-reference-mode .rx-reference-toolbar button:disabled {
+  color: rgba(255,255,255,0.68) !important;
+}
+
+/* Print paper itself remains readable even while app is dark */
+.dark .rx-print-preview {
+  background: #ffffff !important;
+  color: #15252a !important;
+}
