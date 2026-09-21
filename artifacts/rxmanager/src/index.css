@@ -2349,8 +2349,8 @@
    No functional or internal layout changes. */
 @media (min-width: 641px) {
   .rx-reference-mode .rx-medicine-entry {
-    transform: translateY(-0.55rem);
-    margin-bottom: -0.55rem;
+    transform: translateY(-1.15rem);
+    margin-bottom: -1.15rem;
   }
 }
 
