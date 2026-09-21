@@ -2343,3 +2343,21 @@
 .dark .rx-reference-mode .rx-reference-header .rx-doctor-identity-right p:first-child {
   color: var(--rx-reference-header-accent) !important;
 }
+
+/* === Add Medicine vertical alignment only ===
+   Align Medicine header top edge with the left-side Load Patient area.
+   No functional or internal layout changes. */
+@media (min-width: 641px) {
+  .rx-reference-mode .rx-medicine-entry {
+    transform: translateY(-0.55rem);
+    margin-bottom: -0.55rem;
+  }
+}
+
+/* Keep existing mobile positioning untouched */
+@media (max-width: 640px) {
+  .rx-reference-mode .rx-medicine-entry {
+    transform: none;
+    margin-bottom: 0;
+  }
+}
