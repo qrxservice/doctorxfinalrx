@@ -2242,3 +2242,55 @@
   background: #ffffff !important;
   color: #15252a !important;
 }
+
+/* === Light-mode Prescription Header: requested attachment green === */
+.rx-reference-mode .rx-reference-header {
+  background: #087f73 !important;
+  color: #ffffff !important;
+}
+
+.rx-reference-mode .rx-reference-header .rx-screen-clinic-label,
+.rx-reference-mode .rx-reference-header .rx-screen-doctor-name,
+.rx-reference-mode .rx-reference-header .text-muted-foreground {
+  color: #ffffff !important;
+}
+
+.rx-reference-mode .rx-reference-header .rx-doctor-identity-left p:first-child,
+.rx-reference-mode .rx-reference-header .rx-doctor-identity-right p:first-child {
+  color: #ffffff !important;
+}
+
+.rx-reference-mode .rx-reference-header .rx-reference-patient-summary,
+.rx-reference-mode .rx-reference-header .rx-reference-patient-summary *,
+.rx-reference-mode .rx-reference-header .rx-queue-summary-inline-title,
+.rx-reference-mode .rx-reference-header .rx-queue-inline-stats span,
+.rx-reference-mode .rx-reference-header .rx-queue-inline-stats strong {
+  color: #ffffff !important;
+}
+
+/* Dark mode Prescription Header: preserve existing dark background */
+.dark .rx-reference-mode .rx-reference-header {
+  background: var(--rx-reference-header-bg) !important;
+  color: var(--rx-reference-header-ink) !important;
+}
+
+.dark .rx-reference-mode .rx-reference-header .rx-screen-clinic-label,
+.dark .rx-reference-mode .rx-reference-header .rx-screen-doctor-name {
+  color: var(--rx-reference-header-ink) !important;
+}
+
+.dark .rx-reference-mode .rx-reference-header .text-muted-foreground,
+.dark .rx-reference-mode .rx-reference-header .rx-queue-inline-stats span {
+  color: var(--rx-reference-header-muted) !important;
+}
+
+.dark .rx-reference-mode .rx-reference-header .rx-doctor-identity-left p:first-child,
+.dark .rx-reference-mode .rx-reference-header .rx-doctor-identity-right p:first-child,
+.dark .rx-reference-mode .rx-reference-header .rx-queue-summary-inline-title {
+  color: var(--rx-reference-header-accent) !important;
+}
+
+.dark .rx-reference-mode .rx-reference-header .rx-queue-inline-stats strong,
+.dark .rx-reference-mode .rx-reference-header .rx-reference-patient-summary {
+  color: var(--rx-reference-header-ink) !important;
+}
