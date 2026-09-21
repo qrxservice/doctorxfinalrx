@@ -2825,3 +2825,58 @@
   color: #ffffff !important;
   border-color: #477079 !important;
 }
+
+/* === Queue Summary readability + break emphasis === */
+
+/* Increase queue labels by 2px from current .68rem (~10.9px) */
+.rx-reference-mode .rx-queue-inline-stats > div > span {
+  font-size: calc(.68rem + 2px) !important;
+  font-weight: 650 !important;
+}
+
+/* Increase queue values by 2px from current .9rem (~14.4px) */
+.rx-reference-mode .rx-queue-inline-stats > div > strong {
+  font-size: calc(.9rem + 2px) !important;
+  font-weight: 750 !important;
+}
+
+/* Break label: clearly visible warm accent */
+.rx-reference-mode .rx-queue-break-inline > span {
+  color: #b45309 !important;
+  font-weight: 800 !important;
+}
+
+/* Countdown: prominent but professional */
+.rx-reference-mode .rx-queue-break-inline > strong {
+  color: #c2410c !important;
+  font-size: calc(.9rem + 2px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em;
+}
+
+/* Timer icon follows countdown accent */
+.rx-reference-mode .rx-queue-break-inline > strong svg {
+  color: #ea580c !important;
+}
+
+/* Dark mode break/countdown */
+.dark .rx-reference-mode .rx-queue-break-inline > span {
+  color: #fbbf24 !important;
+}
+
+.dark .rx-reference-mode .rx-queue-break-inline > strong,
+.dark .rx-reference-mode .rx-queue-break-inline > strong svg {
+  color: #fb923c !important;
+}
+
+/* Keep mobile readable without affecting desktop one-row layout */
+@media (max-width: 640px) {
+  .rx-reference-mode .rx-queue-inline-stats > div > span {
+    font-size: calc(.6rem + 2px) !important;
+  }
+
+  .rx-reference-mode .rx-queue-inline-stats > div > strong,
+  .rx-reference-mode .rx-queue-break-inline > strong {
+    font-size: calc(.78rem + 2px) !important;
+  }
+}
