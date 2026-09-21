@@ -2361,3 +2361,161 @@
     margin-bottom: 0;
   }
 }
+
+
+/* === Prescription section consistency + collapsible headers === */
+
+/* Shared surface: match the clean Add Medicine input/body visual family. */
+.rx-reference-mode .rx-clinical-section,
+.rx-reference-mode .rx-notes-card {
+  border: 1px solid var(--rx-reference-border);
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.rx-reference-mode .rx-clinical-section textarea,
+.rx-reference-mode .rx-clinical-section input,
+.rx-reference-mode .rx-notes-card textarea,
+.rx-reference-mode .rx-notes-card input {
+  background: #ffffff;
+  color: #17353d;
+  border-color: var(--rx-reference-border);
+}
+
+/* Minimal section header: intentionally lighter than Add Medicine header. */
+.rx-reference-mode .rx-section-header,
+.rx-reference-mode .rx-cc-section > div:first-child,
+.rx-reference-mode .rx-oe-section > div:first-child,
+.rx-reference-mode .rx-ix-section > div:first-child {
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .35rem .55rem;
+  background: rgba(8, 127, 115, .07);
+  border-bottom: 1px solid rgba(8, 127, 115, .16);
+  color: #087f73;
+}
+
+.rx-reference-mode .rx-section-toggle {
+  flex: 0 0 auto;
+  border: 1px solid rgba(8, 127, 115, .22);
+  border-radius: .35rem;
+  background: rgba(255,255,255,.72);
+  color: #087f73;
+  padding: .12rem .45rem;
+  font-size: .625rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.rx-reference-mode .rx-section-toggle:hover {
+  background: rgba(8,127,115,.09);
+  border-color: rgba(8,127,115,.38);
+}
+
+.rx-reference-mode .rx-section-body {
+  padding: .5rem;
+}
+
+/* Dark mode uses the same hierarchy, adapted to the existing dark Rx theme. */
+.dark .rx-reference-mode .rx-clinical-section,
+.dark .rx-reference-mode .rx-notes-card {
+  border-color: #27474d;
+  background: #111c24;
+}
+
+.dark .rx-reference-mode .rx-clinical-section textarea,
+.dark .rx-reference-mode .rx-clinical-section input,
+.dark .rx-reference-mode .rx-notes-card textarea,
+.dark .rx-reference-mode .rx-notes-card input {
+  background: #102027;
+  color: #edf9fa;
+  border-color: #31535a;
+}
+
+.dark .rx-reference-mode .rx-section-header,
+.dark .rx-reference-mode .rx-cc-section > div:first-child,
+.dark .rx-reference-mode .rx-oe-section > div:first-child,
+.dark .rx-reference-mode .rx-ix-section > div:first-child {
+  background: rgba(8,127,115,.16);
+  border-bottom-color: rgba(142,217,232,.15);
+  color: #8ed9e8;
+}
+
+.dark .rx-reference-mode .rx-section-toggle {
+  background: rgba(16,43,49,.82);
+  border-color: rgba(142,217,232,.24);
+  color: #bfecef;
+}
+
+.dark .rx-reference-mode .rx-section-toggle:hover {
+  background: rgba(8,127,115,.24);
+}
+
+/* Keep collapsed headers compact. */
+.rx-reference-mode .rx-clinical-section[data-section-open="false"] {
+  padding-bottom: 0;
+}
+
+
+/* === Queue Summary: live serial + break countdown === */
+
+.rx-reference-mode .rx-queue-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+  margin-left: .3rem;
+  font-size: .55rem;
+  font-weight: 700;
+  color: #087f73;
+}
+
+.rx-reference-mode .rx-queue-live-dot {
+  width: .35rem;
+  height: .35rem;
+  flex: 0 0 auto;
+  border-radius: 9999px;
+  background: #10b981;
+  animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
+}
+
+.rx-reference-mode .rx-queue-break-inline {
+  min-width: 0;
+}
+
+.rx-reference-mode .rx-queue-break-inline span {
+  color: #9a6700 !important;
+}
+
+.rx-reference-mode .rx-queue-break-inline strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .2rem;
+  white-space: nowrap;
+  color: #9a6700 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.dark .rx-reference-mode .rx-queue-live-indicator {
+  color: #8ed9e8;
+}
+
+.dark .rx-reference-mode .rx-queue-break-inline span,
+.dark .rx-reference-mode .rx-queue-break-inline strong {
+  color: #facc15 !important;
+}
+
+/* Keep the expanded live summary compact on narrower screens. */
+@media (max-width: 640px) {
+  .rx-reference-mode .rx-queue-live-indicator {
+    font-size: .5rem;
+  }
+
+  .rx-reference-mode .rx-queue-break-inline strong {
+    font-size: .7rem;
+  }
+}

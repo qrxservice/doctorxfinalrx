@@ -962,12 +962,14 @@ export default function NewPrescriptionPage() {
   const [newTmpl, setNewTmpl] = useState(emptyTemplateForm());
   const [templateMedicines, setTemplateMedicines] = useState<MedItem[]>([]);
   const [editingTmplId, setEditingTmplId] = useState<number | null>(null);
-  // C/C, O/E and IX are collapsed by default to keep the left panel short — they
-  // only expand on click, or automatically if a loaded/edited patient already has
-  // content for that section (so existing data is never hidden).
-  const [ccOpen, setCcOpen] = useState(false);
-  const [oeOpen, setOeOpen] = useState(false);
-  const [ixOpen, setIxOpen] = useState(false);
+  // Prescription writing sections are open by default.
+  // Collapsing only hides the editor UI; entered values remain in state.
+  const [ccOpen, setCcOpen] = useState(true);
+  const [oeOpen, setOeOpen] = useState(true);
+  const [ixOpen, setIxOpen] = useState(true);
+  const [drugHistoryOpen, setDrugHistoryOpen] = useState(true);
+  const [adviceOpen, setAdviceOpen] = useState(true);
+  const [treatmentNoteOpen, setTreatmentNoteOpen] = useState(true);
   const [loadedApptId, setLoadedApptId] = useState<number | null>(null);
   const [reportUploading, setReportUploading] = useState(false);
 
@@ -2556,6 +2558,13 @@ export default function NewPrescriptionPage() {
     } catch { toast({ title: "Failed to end break", variant: "destructive" }); }
   };
 
+  // Automatically restore Available status when the selected break duration ends.
+  // The countdown itself remains driven by the server-provided breakUntil value.
+  useEffect(() => {
+    if (!breakExpired || !isOnBreak) return;
+    void handleEndBreak();
+  }, [breakExpired, isOnBreak]);
+
   const breakControls = isOnBreak ? (
     <Button
       type="button"
@@ -2621,12 +2630,32 @@ export default function NewPrescriptionPage() {
         </div>
 
         <div className="rx-queue-summary-inline" aria-label={L.queueSummary}>
-          <div className="rx-queue-summary-inline-title"><Activity className="h-3.5 w-3.5" />{L.queueSummary}</div>
+          <div className="rx-queue-summary-inline-title">
+            <Activity className="h-3.5 w-3.5" />
+            {L.queueSummary}
+            <span className="rx-queue-live-indicator">
+              <span className="rx-queue-live-dot" />
+              {L.liveTag}
+            </span>
+          </div>
           <div className="rx-queue-inline-stats">
+            <div>
+              <span>{L.nowServingShort}</span>
+              <strong>{queueServing ? `#${queueServing.serialNo}` : "—"}</strong>
+            </div>
             <div><span>{L.totalAppts}</span><strong>{qTotalToday}</strong></div>
             <div><span>{L.waitingShort}</span><strong>{queueWaiting.length}</strong></div>
             <div><span>{isBn ? "পরামর্শ চলছে" : "In Consultation"}</span><strong>{queueServing ? 1 : 0}</strong></div>
             <div><span>{L.completedCount}</span><strong>{qCompleted}</strong></div>
+            {isOnBreak && (
+              <div className="rx-queue-break-inline">
+                <span>{L.breakActive}</span>
+                <strong>
+                  <Timer className="h-3 w-3" />
+                  {breakCdStr ?? "00:00:00"}
+                </strong>
+              </div>
+            )}
           </div>
         </div>
 
@@ -2978,12 +3007,23 @@ export default function NewPrescriptionPage() {
               {/* C/C — always visible; the existing open state remains available
                   for loaded/draft data and is marked when the field is focused. */}
               <div className="rx-clinical-section rx-cc-section" data-section-open={ccOpen}>
-                <div className="flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400">
+                <div className="flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400 justify-between">
                   <span className="flex items-center gap-1">
                     {L.ccLabel}
                     {patient.cc && <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />}
                   </span>
-                </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setCcOpen(v => !v)}
+                    className="rx-section-toggle"
+                    aria-expanded={ccOpen}
+                  >
+                    {ccOpen ? L.tmplHide : L.tmplShow}
+                  </button></div>
+                {ccOpen && (
+                  <div className="rx-section-body">
+
                 <div className="flex flex-wrap gap-0.5 mt-1 mb-0.5">
                   {(templates["cc"] ?? []).slice(0, 4).map(t => (
                     <button key={t.id} type="button" onClick={() => applyTemplate(t)}
@@ -3004,13 +3044,16 @@ export default function NewPrescriptionPage() {
                     <Save className="h-3 w-3" />{L.save}
                   </Button>
                 </div>
-              </div>
+
+                  </div>
+                )}
+</div>
 
               <Separator className="my-1" />
 
               {/* O/E — always visible; preserve the existing text/box mode control. */}
               <div className="rx-clinical-section rx-oe-section" data-section-open={oeOpen}>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 justify-between">
                   <span className="flex-1 flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400">
                     O/E
                     {patient.oe && <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />}
@@ -3020,7 +3063,18 @@ export default function NewPrescriptionPage() {
                     className={cn("text-[9px] px-1.5 py-0.5 rounded border transition-colors shrink-0", patient.oeMode === "box" ? "bg-primary text-primary-foreground border-primary" : "bg-muted border-border")}>
                     {L.box}
                   </button>
-                </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setOeOpen(v => !v)}
+                    className="rx-section-toggle"
+                    aria-expanded={oeOpen}
+                  >
+                    {oeOpen ? L.tmplHide : L.tmplShow}
+                  </button></div>
+                {oeOpen && (
+                  <div className="rx-section-body">
+
                 <div className="mt-1">
                   {(templates["oe"] ?? []).slice(0, 2).map(t => (
                     <button key={t.id} type="button" onClick={() => applyTemplate(t)}
@@ -3041,18 +3095,32 @@ export default function NewPrescriptionPage() {
                     <Save className="h-3 w-3" />{L.save}
                   </Button>
                 </div>
-              </div>
+
+                  </div>
+                )}
+</div>
 
               <Separator className="my-1" />
 
               {/* IX — always visible and editable. */}
               <div className="rx-clinical-section rx-ix-section" data-section-open={ixOpen}>
-                <div className="flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400">
+                <div className="flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400 justify-between">
                   <span className="flex items-center gap-1">
                     {L.ixLabel}
                     {(patient.ixChips.length > 0 || patient.ixCustom) && <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />}
                   </span>
-                </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIxOpen(v => !v)}
+                    className="rx-section-toggle"
+                    aria-expanded={ixOpen}
+                  >
+                    {ixOpen ? L.tmplHide : L.tmplShow}
+                  </button></div>
+                {ixOpen && (
+                  <div className="rx-section-body">
+
                 <div className="flex flex-wrap gap-0.5 mt-1">
                   {IX_CHIPS.map(chip => (
                     <button key={chip} type="button"
@@ -3080,13 +3148,29 @@ export default function NewPrescriptionPage() {
                     <Save className="h-3 w-3" />{L.save}
                   </Button>
                 </div>
-              </div>
+
+                  </div>
+                )}
+</div>
 
               <Separator className="my-1" />
 
               {/* Drug History */}
               <div className="rx-clinical-section rx-drug-history-section">
-                <label className="text-xs font-bold text-teal-700 dark:text-teal-400">{L.drugHistory}</label>
+                <div className="rx-section-header">
+                  <label className="text-xs font-bold">{L.drugHistory}</label>
+                  <button
+                    type="button"
+                    onClick={() => setDrugHistoryOpen(v => !v)}
+                    className="rx-section-toggle"
+                    aria-expanded={drugHistoryOpen}
+                  >
+                    {drugHistoryOpen ? L.tmplHide : L.tmplShow}
+                  </button>
+                </div>
+                {drugHistoryOpen && (
+                  <div className="rx-section-body">
+
                 <div className="mt-1">
                   {(templates["drugHistory"] ?? []).slice(0, 3).map(t => (
                     <button key={t.id} type="button" onClick={() => applyTemplate(t)}
@@ -3101,7 +3185,10 @@ export default function NewPrescriptionPage() {
                     <Save className="h-3 w-3" />{L.save}
                   </Button>
                 </div>
-              </div>
+
+                  </div>
+                )}
+</div>
 
               <Separator className="my-1" />
 
@@ -3627,9 +3714,20 @@ export default function NewPrescriptionPage() {
 
               {/* ── ADVICE ─────────────────────────────────────────── */}
               <div className="rx-notes-card border rounded-xl overflow-hidden shadow-sm">
-                <div className="bg-blue-50 dark:bg-blue-950/30 px-3 py-2 border-b">
-                  <h3 className="text-xs font-bold text-blue-700 dark:text-blue-300">{L.advice}</h3>
+                <div className="rx-section-header">
+                  <h3 className="text-xs font-bold">{L.advice}</h3>
+                  <button
+                    type="button"
+                    onClick={() => setAdviceOpen(v => !v)}
+                    className="rx-section-toggle"
+                    aria-expanded={adviceOpen}
+                  >
+                    {adviceOpen ? L.tmplHide : L.tmplShow}
+                  </button>
                 </div>
+                {adviceOpen && (
+                  <div className="rx-section-body">
+
                 <div className="p-2.5 space-y-1.5">
                   <AutoGrowingTextarea className="text-sm min-h-[56px] resize-none" placeholder={L.advicePlaceholder} value={advice} onChange={e => setAdvice(e.target.value)} />
                    <div className="rx-template-group">
@@ -3652,13 +3750,27 @@ export default function NewPrescriptionPage() {
                     </Button>
                   </div>
                 </div>
-              </div>
+
+                  </div>
+                )}
+</div>
 
               {/* ── TREATMENT NOTE ───────────────────────────────────── */}
               <div className="rx-notes-card border rounded-xl overflow-hidden shadow-sm">
-                <div className="bg-amber-50 dark:bg-amber-950/30 px-3 py-2 border-b">
-                  <h3 className="text-xs font-bold text-amber-700 dark:text-amber-300">{L.treatmentNote}</h3>
+                <div className="rx-section-header">
+                  <h3 className="text-xs font-bold">{L.treatmentNote}</h3>
+                  <button
+                    type="button"
+                    onClick={() => setTreatmentNoteOpen(v => !v)}
+                    className="rx-section-toggle"
+                    aria-expanded={treatmentNoteOpen}
+                  >
+                    {treatmentNoteOpen ? L.tmplHide : L.tmplShow}
+                  </button>
                 </div>
+                {treatmentNoteOpen && (
+                  <div className="rx-section-body">
+
                 <div className="p-2.5 space-y-1.5">
                   <AutoGrowingTextarea className="text-sm min-h-[56px] resize-none" placeholder={L.treatmentPlaceholder} value={treatmentNote} onChange={e => setTreatmentNote(e.target.value)} />
                   <div className="flex flex-wrap gap-1">
@@ -3675,7 +3787,10 @@ export default function NewPrescriptionPage() {
                     </Button>
                   </div>
                 </div>
-              </div>
+
+                  </div>
+                )}
+</div>
               <div className="rx-followup-card rx-prescription-font flex min-w-0 w-full max-w-full flex-col gap-1.5 rounded-xl border bg-background px-3 py-3">
                  <div className="flex min-w-0 w-full flex-wrap items-center gap-1.5">
                    <label className="text-xs font-bold uppercase tracking-wide text-green-700 dark:text-green-400 whitespace-nowrap">{L.followUpDate}</label>
