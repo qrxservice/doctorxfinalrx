@@ -601,18 +601,72 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
   const showHeader = (s ? s.showHeader : true) && !hideHeaderForPrint;
 
   // Save & Print opens this saved prescription in a new tab with autoprint=1.
-  // Trigger the browser print dialog once, after the print view has mounted.
+  // Wait until fonts, images and the print layout are actually ready before
+  // opening the browser print dialog. This avoids racing the reprint render.
   useEffect(() => {
     if (autoPrintHandledRef.current) return;
+
     const params = new URLSearchParams(window.location.search);
     if (params.get("autoprint") !== "1") return;
 
     autoPrintHandledRef.current = true;
-    const timer = window.setTimeout(() => {
-      window.print();
-    }, 350);
+    let cancelled = false;
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
 
-    return () => window.clearTimeout(timer);
+    const waitForImages = async () => {
+      const root = document.getElementById("rxprint");
+      if (!root) return;
+
+      const images = Array.from(root.querySelectorAll("img"));
+      await Promise.all(
+        images.map(image => {
+          if (image.complete) return Promise.resolve();
+
+          return new Promise<void>(resolve => {
+            const done = () => resolve();
+            image.addEventListener("load", done, { once: true });
+            image.addEventListener("error", done, { once: true });
+          });
+        }),
+      );
+    };
+
+    const openPrintDialog = async () => {
+      try {
+        if ("fonts" in document) {
+          await document.fonts.ready;
+        }
+        await waitForImages();
+
+        await new Promise<void>(resolve => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => resolve());
+          });
+        });
+
+        if (!cancelled) window.print();
+      } catch {
+        if (!cancelled) window.print();
+      }
+    };
+
+    // Safety fallback: never leave Save & Print stuck if a browser reports a
+    // font/image as pending indefinitely.
+    fallbackTimer = setTimeout(() => {
+      if (!cancelled) window.print();
+    }, 5000);
+
+    void openPrintDialog().finally(() => {
+      if (fallbackTimer) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      if (fallbackTimer) clearTimeout(fallbackTimer);
+    };
   }, []);
   // One-click print that omits the letterhead regardless of the saved setting.
   // Wait for the header to actually unmount (two paints) before printing, then
