@@ -545,8 +545,16 @@ function PrescriptionFontStyles() {
   return (
     <style>{`
       @import url("https://fonts.maateen.me/kalpurush/font.css");
+
       .rx-prescription-font {
-        font-family: Inter, "Kalpurush", system-ui, sans-serif;
+        font-family: Inter, system-ui, sans-serif;
+      }
+
+      .rx-prescription-font.rx-bangla-font,
+      .rx-prescription-font.rx-bangla-font *,
+      .rx-bangla-font,
+      .rx-bangla-font * {
+        font-family: "Kalpurush", "Noto Sans Bengali", sans-serif !important;
       }
     `}</style>
   );
@@ -589,7 +597,23 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
 }) {
   const s = settings;
   const [hideHeaderForPrint, setHideHeaderForPrint] = useState(false);
+  const autoPrintHandledRef = useRef(false);
   const showHeader = (s ? s.showHeader : true) && !hideHeaderForPrint;
+
+  // Save & Print opens this saved prescription in a new tab with autoprint=1.
+  // Trigger the browser print dialog once, after the print view has mounted.
+  useEffect(() => {
+    if (autoPrintHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("autoprint") !== "1") return;
+
+    autoPrintHandledRef.current = true;
+    const timer = window.setTimeout(() => {
+      window.print();
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, []);
   // One-click print that omits the letterhead regardless of the saved setting.
   // Wait for the header to actually unmount (two paints) before printing, then
   // restore it once the print dialog closes via the afterprint event.
@@ -632,11 +656,12 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
   const footerHeight = s?.footerHeight ?? 15;
   const refNo = rx.referenceNo || `#${rx.id}`;
   const isDraft = rx.status === "draft";
+  const isBn = L.dateLocale === "bn-BD";
   const rxDate = new Date(rx.createdAt).toLocaleDateString(L.dateLocale, { day: "2-digit", month: "2-digit", year: "numeric" });
   const vitalsLines: string[] = rx.vitals ? String(rx.vitals).split(/[\n,]+/).map((v: string) => v.trim()).filter(Boolean) : [];
 
   return (
-    <div className="rx-print-page rx-prescription-font min-h-screen bg-gray-100 p-4 print:p-0 print:bg-white">
+    <div className={cn("rx-print-page rx-prescription-font min-h-screen bg-gray-100 p-4 print:p-0 print:bg-white", isBn && "rx-bangla-font")}>
       <PrescriptionFontStyles />
       <style>{`@media print{html,body{overflow:visible!important;background:#fff!important}@page{size:${pageSize};margin:${mt}mm ${mr}mm ${mb}mm ${ml}mm}body *{visibility:hidden}.rx-print-page>.no-print,.rx-print-page>.no-print *,.no-print{display:none!important;visibility:hidden!important}#rxprint,#rxprint *{visibility:visible}#rxprint{position:static;width:auto;max-width:none;margin:0;background:white;box-sizing:border-box}.rx-print-header,.rx-print-patient,.rx-print-medicine,.rx-print-footer{break-inside:avoid;page-break-inside:avoid}}`}</style>
       <div className="no-print flex gap-2 mb-4 items-center flex-wrap">
@@ -2273,11 +2298,7 @@ export default function NewPrescriptionPage() {
       patient.phone ? `Mobile: ${patient.phone}` : "",
       patient.address ? `Address: ${patient.address}` : "",
       `Date: ${patient.date || toLocalDateStr(new Date())}`,
-      freePatient
-        ? `Patient type: Free Patient (${consultationCurrencySymbol}0)`
-        : oldPatient
-          ? `Patient type: Old Patient (${consultationCurrencySymbol}${savedConsultationFee})`
-          : `Consultation fee: ${consultationCurrencySymbol}${profileConsultationFee}`,
+
       patient.cc ? `Chief complaint: ${patient.cc}` : "",
       patient.oe ? `Examination: ${patient.oe}` : "",
       patient.drugHistory ? `Drug history: ${patient.drugHistory}` : "",
@@ -2383,7 +2404,7 @@ export default function NewPrescriptionPage() {
       if (printAfter) {
         // Open the print view in a NEW TAB — current tab stays open for next patient.
         const basePath = String(import.meta.env.BASE_URL || "/").replace(/\/?$/, "/");
-        const printUrl = `${window.location.origin}${basePath}doctor/new-prescription?reprint=${result.id}`;
+        const printUrl = `${window.location.origin}${basePath}doctor/new-prescription?reprint=${result.id}&autoprint=1`;
         if (printWindow && !printWindow.closed) {
           printWindow.location.assign(printUrl);
         } else {
@@ -2624,7 +2645,7 @@ export default function NewPrescriptionPage() {
 
   /* ── RENDER ──────────────────────────────────────────────────────── */
   return (
-    <div className="rx-shell rx-reference-mode min-h-screen min-w-0 flex flex-col bg-background overflow-x-hidden">
+    <div className={cn("rx-shell rx-reference-mode min-h-screen min-w-0 flex flex-col bg-background overflow-x-hidden", isBn && "rx-bangla-font")}>
 
       {/* ══ REFERENCE-STYLE HEADER ═════════════════════════════════════ */}
        <header className="rx-topbar rx-reference-header min-w-0 shrink-0 border-b px-3 py-2 print:hidden relative">

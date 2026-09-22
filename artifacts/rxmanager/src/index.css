@@ -2880,3 +2880,26 @@
     font-size: calc(.78rem + 2px) !important;
   }
 }
+
+/* === Bengali prescription typography: Kalpurush === */
+.rx-shell.rx-bangla-font,
+.rx-shell.rx-bangla-font *,
+.rx-reference-mode.rx-bangla-font,
+.rx-reference-mode.rx-bangla-font *,
+.rx-print-page.rx-bangla-font,
+.rx-print-page.rx-bangla-font * {
+  font-family: "Kalpurush", "Noto Sans Bengali", sans-serif !important;
+}
+
+/* Preserve medical Rx symbol styling. */
+.rx-shell.rx-bangla-font .rx-print-mark,
+.rx-reference-mode.rx-bangla-font .rx-screen-doctor-mark,
+.rx-print-page.rx-bangla-font .rx-print-mark {
+  font-family: Georgia, "Times New Roman", serif !important;
+}
+
+/* Preserve countdown readability. */
+.rx-shell.rx-bangla-font .rx-queue-break-inline > strong,
+.rx-reference-mode.rx-bangla-font .rx-queue-break-inline > strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
