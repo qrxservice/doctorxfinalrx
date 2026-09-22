@@ -2910,3 +2910,20 @@
     display: none !important;
   }
 }
+
+/* === Light mode: transparent writing fields only ===
+   Keep section/card backgrounds, borders, radius, controls and dark mode unchanged. */
+.rx-reference-mode .rx-notes-card textarea,
+.rx-reference-mode .rx-notes-card input,
+.rx-reference-mode .rx-followup-card input,
+.rx-reference-mode .rx-followup-card select {
+  background-color: transparent !important;
+}
+
+/* Dark mode remains exactly on its existing dark surface. */
+.dark .rx-reference-mode .rx-notes-card textarea,
+.dark .rx-reference-mode .rx-notes-card input,
+.dark .rx-reference-mode .rx-followup-card input,
+.dark .rx-reference-mode .rx-followup-card select {
+  background-color: #16262b !important;
+}
