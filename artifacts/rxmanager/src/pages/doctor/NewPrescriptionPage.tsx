@@ -2246,10 +2246,22 @@ export default function NewPrescriptionPage() {
     const dupStr = params.get("duplicate");
     const reprintStr = params.get("reprint");
     const loadId = idStr || dupStr || reprintStr;
-    if (!loadId) { lastLoadedRef.current = null; return; }
+
+    if (!loadId) {
+      lastLoadedRef.current = null;
+      return;
+    }
+
+    // URL-loaded prescriptions are protected API resources. On a newly opened
+    // Save & Print tab, wait until AuthProvider has restored the logged-in user
+    // before issuing getPrescription(), otherwise the first request can race
+    // auth initialization and receive 401.
+    if (isLoading || !user) return;
+
     const loadKey = `${reprintStr ? "r" : idStr ? "e" : "d"}:${loadId}`;
     if (lastLoadedRef.current === loadKey) return;
     lastLoadedRef.current = loadKey;
+
     getPrescription(Number(loadId)).then(async rx => {
       populateFromRx(rx);
       if (reprintStr) {
@@ -2295,7 +2307,7 @@ export default function NewPrescriptionPage() {
         });
       }
     });
-  }, [searchStr]);
+  }, [searchStr, isLoading, user]);
 
   // ── Reset form to blank state (for next patient)
   const resetForm = () => {
