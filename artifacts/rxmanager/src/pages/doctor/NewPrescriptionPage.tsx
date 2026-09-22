@@ -2270,11 +2270,27 @@ export default function NewPrescriptionPage() {
       });
       lastLoadedRef.current = null;
       if (reprintStr) {
+        const apiError = error as {
+          status?: number;
+          statusText?: string;
+          message?: string;
+          data?: { error?: string; message?: string } | null;
+          url?: string;
+        };
+
+        const status = apiError?.status ?? "unknown";
+        const detail =
+          apiError?.data?.error ??
+          apiError?.data?.message ??
+          apiError?.message ??
+          apiError?.statusText ??
+          "Unknown error";
+
         toast({
-          title: isBn ? "প্রেসক্রিপশন লোড হয়নি" : "Prescription could not be loaded",
-          description: isBn
-            ? "Save & Print-এর জন্য সংরক্ষিত প্রেসক্রিপশনটি লোড করা যায়নি।"
-            : "The saved prescription could not be loaded for printing.",
+          title: isBn
+            ? `প্রেসক্রিপশন লোড হয়নি (${status})`
+            : `Prescription could not be loaded (${status})`,
+          description: `${detail}`,
           variant: "destructive",
         });
       }
