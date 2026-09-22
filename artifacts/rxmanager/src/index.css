@@ -2903,3 +2903,10 @@
 .rx-reference-mode.rx-bangla-font .rx-queue-break-inline > strong {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
+
+/* Print Without Header: remove the top Ref No / Date meta row. */
+@media print {
+  .rx-print-without-header .rx-print-meta {
+    display: none !important;
+  }
+}

@@ -729,13 +729,18 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
           <Button size="sm" onClick={onNewRx}><Plus className="h-4 w-4 mr-1.5" />{nextPatientLabel ? `${L.nextColon} ${nextPatientLabel}` : L.navNewRx}</Button>
         </div>
       </div>
-      <div id="rxprint" className="rx-print-preview max-w-3xl mx-auto bg-white rounded-xl border shadow-lg print:shadow-none print:border-none print:rounded-none">
+      <div
+        id="rxprint"
+        className={cn(
+          "rx-print-preview max-w-3xl mx-auto bg-white rounded-xl border shadow-lg print:shadow-none print:border-none print:rounded-none",
+          hideHeaderForPrint && "rx-print-without-header",
+        )}
+      >
         {/* Letterhead */}
         {showHeader && (
           <div className="rx-print-header text-white p-5 print:p-4" style={{ minHeight: `${headerHeight}mm` }}>
             <div className="rx-print-header-content">
               <div className="rx-print-doctor">
-                <div className="rx-print-mark" aria-hidden="true">℞</div>
                 <div>
                   <h1 className="text-xl font-bold leading-tight">{hName}</h1>
                   {hDegree && <p className="text-teal-100 text-sm">{hDegree}</p>}
@@ -2539,7 +2544,7 @@ export default function NewPrescriptionPage() {
   };
 
   const handlePreview = () => {
-    const allIx = [...patient.ixChips, ...(patient.ixCustom ? patient.ixCustom.split(",").map(s => s.trim()).filter(Boolean) : [])].join(", ");
+    const allIx = [...(patient.ixChips ?? []), ...(patient.ixCustom ? patient.ixCustom.split(",").map(s => s.trim()).filter(Boolean) : [])].join(", ");
     const vitalsStr = [
       patient.bp && `BP: ${patient.bp}`,
       patient.pulse && `Pulse: ${patient.pulse}`,
@@ -2579,8 +2584,8 @@ export default function NewPrescriptionPage() {
         dosageForm: m.dosageForm || null,
         dose: m.dose || null,
         mealTiming: m.timing || null,
-        duration: m.durationNum.trim()
-          ? `${m.durationNum.trim()} ${m.durationUnit === "D" ? "দিন" : m.durationUnit === "W" ? "সপ্তাহ" : "মাস"}`
+        duration: String(m.durationNum ?? "").trim()
+          ? `${String(m.durationNum ?? "").trim()} ${m.durationUnit === "D" ? "দিন" : m.durationUnit === "W" ? "সপ্তাহ" : "মাস"}`
           : null,
         instruction: m.instructions || null,
       })),
