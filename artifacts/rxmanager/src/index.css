@@ -2927,3 +2927,36 @@
 .dark .rx-reference-mode .rx-followup-card select {
   background-color: #16262b !important;
 }
+
+/* === LEFT PANEL LIGHT SURFACE UNIFICATION ===
+   Match Patient Information through clinical/template/recent-medicine area
+   to the existing soft green Vitals/Diagnosis visual family.
+   Structure, borders, radius, controls and dark mode stay unchanged. */
+
+.rx-reference-mode .rx-context-panel {
+  background-color: #f1fbf3 !important;
+}
+
+.rx-reference-mode .rx-context-panel .rx-patient-info-card,
+.rx-reference-mode .rx-context-panel .rx-vitals-card,
+.rx-reference-mode .rx-context-panel .rx-clinical-section,
+.rx-reference-mode .rx-context-panel .rx-diagnosis-field {
+  background-color: rgba(232, 247, 232, 0.72) !important;
+}
+
+/* Keep the writing/control fields softly integrated with that background. */
+.rx-reference-mode .rx-context-panel :where(input, textarea, select) {
+  background-color: rgba(255, 255, 255, 0.62);
+}
+
+/* DARK MODE: explicitly preserve the existing dark surfaces. */
+.dark .rx-reference-mode .rx-context-panel {
+  background-color: inherit !important;
+}
+
+.dark .rx-reference-mode .rx-context-panel .rx-patient-info-card,
+.dark .rx-reference-mode .rx-context-panel .rx-vitals-card,
+.dark .rx-reference-mode .rx-context-panel .rx-clinical-section,
+.dark .rx-reference-mode .rx-context-panel .rx-diagnosis-field {
+  background-color: #10272d !important;
+}
