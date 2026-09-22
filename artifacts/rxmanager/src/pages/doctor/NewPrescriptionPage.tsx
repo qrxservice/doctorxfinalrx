@@ -2262,7 +2262,23 @@ export default function NewPrescriptionPage() {
       } else if (idStr) {
         setEditingId(rx.id);
       }
-    }).catch(() => {});
+    }).catch(error => {
+      console.error("Failed to load prescription from URL", {
+        loadId,
+        reprint: !!reprintStr,
+        error,
+      });
+      lastLoadedRef.current = null;
+      if (reprintStr) {
+        toast({
+          title: isBn ? "প্রেসক্রিপশন লোড হয়নি" : "Prescription could not be loaded",
+          description: isBn
+            ? "Save & Print-এর জন্য সংরক্ষিত প্রেসক্রিপশনটি লোড করা যায়নি।"
+            : "The saved prescription could not be loaded for printing.",
+          variant: "destructive",
+        });
+      }
+    });
   }, [searchStr]);
 
   // ── Reset form to blank state (for next patient)
@@ -2374,9 +2390,12 @@ export default function NewPrescriptionPage() {
     if (!patient.name.trim()) {
       toast({ title: L.enterPatientName, variant: "destructive" }); return;
     }
-    // Open synchronously from the button click so browser popup blockers do not
-    // discard the print tab while the save request is in flight.
-    const printWindow = printAfter ? window.open("about:blank", "_blank") : null;
+    // Open a same-origin DoctorX tab synchronously so popup blockers allow it
+    // and the tab starts with the same application origin/auth storage.
+    const basePath = String(import.meta.env.BASE_URL || "/").replace(/\/?$/, "/");
+    const printWindow = printAfter
+      ? window.open(`${window.location.origin}${basePath}doctor/new-prescription?printWaiting=1`, "_blank")
+      : null;
     // Investigations-only prescriptions (lab referrals, pathology orders) are
     // valid prescriptions — do not require at least one medicine.
     const allIx = [...patient.ixChips, ...(patient.ixCustom ? patient.ixCustom.split(",").map(s => s.trim()).filter(Boolean) : [])].join(", ");
@@ -2457,7 +2476,6 @@ export default function NewPrescriptionPage() {
 
       if (printAfter) {
         // Open the print view in a NEW TAB — current tab stays open for next patient.
-        const basePath = String(import.meta.env.BASE_URL || "/").replace(/\/?$/, "/");
         const printUrl = `${window.location.origin}${basePath}doctor/new-prescription?reprint=${result.id}&autoprint=1`;
         if (printWindow && !printWindow.closed) {
           printWindow.location.assign(printUrl);
