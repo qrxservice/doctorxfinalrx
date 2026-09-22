@@ -2299,6 +2299,9 @@ export default function NewPrescriptionPage() {
     if (!patient.name.trim()) {
       toast({ title: L.enterPatientName, variant: "destructive" }); return;
     }
+    // Open synchronously from the button click so browser popup blockers do not
+    // discard the print tab while the save request is in flight.
+    const printWindow = printAfter ? window.open("about:blank", "_blank") : null;
     // Investigations-only prescriptions (lab referrals, pathology orders) are
     // valid prescriptions — do not require at least one medicine.
     const allIx = [...patient.ixChips, ...(patient.ixCustom ? patient.ixCustom.split(",").map(s => s.trim()).filter(Boolean) : [])].join(", ");
@@ -2379,7 +2382,13 @@ export default function NewPrescriptionPage() {
 
       if (printAfter) {
         // Open the print view in a NEW TAB — current tab stays open for next patient.
-        window.open(`/doctor/new-prescription?reprint=${result.id}`, "_blank");
+        const basePath = String(import.meta.env.BASE_URL || "/").replace(/\/?$/, "/");
+        const printUrl = `${window.location.origin}${basePath}doctor/new-prescription?reprint=${result.id}`;
+        if (printWindow && !printWindow.closed) {
+          printWindow.location.assign(printUrl);
+        } else {
+          window.open(printUrl, "_blank", "noopener,noreferrer");
+        }
 
         // Auto-advance to next queue patient in the current tab.
         if (nextPatient) {
@@ -2403,6 +2412,7 @@ export default function NewPrescriptionPage() {
         setIsRecallMode(false);
       }
     } catch {
+      if (printWindow && !printWindow.closed) printWindow.close();
       toast({ title: L.saveFailed, variant: "destructive" });
     }
   };
