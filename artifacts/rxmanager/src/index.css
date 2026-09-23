@@ -3302,3 +3302,26 @@
 .dark .rx-reference-mode .rx-consultation-stat > span {
   color: #d1d5db !important;
 }
+
+/* === Take Break: force text + coffee icon orange only === */
+.rx-reference-mode .rx-take-break-button,
+.rx-reference-mode .rx-take-break-button span,
+.rx-reference-mode .rx-take-break-button svg {
+  color: #ea580c !important;
+  stroke: #ea580c !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-take-break-button:hover,
+.rx-reference-mode .rx-take-break-button:hover span,
+.rx-reference-mode .rx-take-break-button:hover svg {
+  color: #c2410c !important;
+  stroke: #c2410c !important;
+}
+
+.dark .rx-reference-mode .rx-take-break-button,
+.dark .rx-reference-mode .rx-take-break-button span,
+.dark .rx-reference-mode .rx-take-break-button svg {
+  color: #fb923c !important;
+  stroke: #fb923c !important;
+}
