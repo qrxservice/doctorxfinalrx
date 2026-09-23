@@ -3146,3 +3146,92 @@
 .dark .rx-reference-mode .rx-consultation-period > span {
   color: #60a5fa !important;
 }
+
+/* === FINAL Consultation Summary visual correction ===
+   Colours/text only. No layout or functionality changes. */
+
+/* Slightly stronger version of the same mint background family. */
+.rx-reference-mode .rx-consultation-summary {
+  background: #e6f7f3 !important;
+  border-color: #73cfc1 !important;
+}
+
+/* Main heading */
+.rx-reference-mode .rx-consultation-summary > div:first-child > div:first-child {
+  color: #087f73 !important;
+  font-weight: 800 !important;
+}
+
+/* Make top controls clearly readable/bold. */
+.rx-reference-mode .rx-consultation-summary label {
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-consultation-profile-fee {
+  color: #15803d !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-consultation-period,
+.rx-reference-mode .rx-consultation-period > span {
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+/* Stat labels are bold and coordinated with their values. */
+.rx-reference-mode .rx-consultation-stat > span,
+.rx-reference-mode .rx-consultation-stat > strong {
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-patients > span,
+.rx-reference-mode .rx-consultation-stat-patients > strong {
+  color: #0369a1 !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-earnings > span,
+.rx-reference-mode .rx-consultation-stat-earnings > strong {
+  color: #15803d !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-free > span,
+.rx-reference-mode .rx-consultation-stat-free > strong {
+  color: #c2410c !important;
+}
+
+/* REMOVE PURPLE COMPLETELY: Selected Period is blue. */
+.rx-reference-mode .rx-consultation-stat-period {
+  background: #eff8ff !important;
+  border-color: #93c5fd !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-period::before {
+  background: #2563eb !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-period > span,
+.rx-reference-mode .rx-consultation-stat-period > strong {
+  color: #1d4ed8 !important;
+  font-weight: 800 !important;
+}
+
+/* Bottom information text: darker, bold and readable. */
+.rx-reference-mode .rx-consultation-summary > p {
+  color: #3f5960 !important;
+  font-weight: 700 !important;
+}
+
+/* Keep dark mode on the existing dark family; remove purple there too. */
+.dark .rx-reference-mode .rx-consultation-stat-period {
+  background: #102a3a !important;
+  border-color: #315d78 !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-stat-period::before {
+  background: #60a5fa !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-stat-period > span,
+.dark .rx-reference-mode .rx-consultation-stat-period > strong {
+  color: #60a5fa !important;
+}
