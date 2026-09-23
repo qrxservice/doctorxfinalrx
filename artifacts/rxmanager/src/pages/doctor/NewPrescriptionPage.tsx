@@ -2720,7 +2720,7 @@ export default function NewPrescriptionPage() {
           type="button"
           size="sm"
           variant="outline"
-          className="h-7 px-2 text-xs gap-1 shrink-0 border-amber-400 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400"
+          className="h-7 px-2 text-xs gap-1 shrink-0 border-amber-400 text-orange-600 font-bold hover:bg-amber-50 hover:text-orange-700 dark:border-amber-700 dark:text-orange-400 dark:hover:text-orange-300"
           disabled={updateStatusRx.isPending}
         >
           <Coffee className="h-3 w-3" />

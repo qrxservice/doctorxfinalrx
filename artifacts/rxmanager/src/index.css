@@ -3292,3 +3292,13 @@
 .dark .rx-reference-mode .rx-consultation-stat-period > strong {
   color: #4ade80 !important;
 }
+
+/* Consultation Summary: stat titles dark gray only */
+.rx-reference-mode .rx-consultation-stat > span {
+  color: #374151 !important;
+  font-weight: 800 !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-stat > span {
+  color: #d1d5db !important;
+}
