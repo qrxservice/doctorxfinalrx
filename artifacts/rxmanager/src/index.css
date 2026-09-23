@@ -3235,3 +3235,60 @@
 .dark .rx-reference-mode .rx-consultation-stat-period > strong {
   color: #60a5fa !important;
 }
+
+/* === FINAL GREEN PERIOD + ORANGE BREAK === */
+
+/* Selected Period Summary: green, no blue/purple. */
+.rx-reference-mode .rx-consultation-stat-period {
+  background: #ecfdf3 !important;
+  border-color: #86d9a5 !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-period::before {
+  background: #15803d !important;
+}
+
+.rx-reference-mode .rx-consultation-stat-period > span,
+.rx-reference-mode .rx-consultation-stat-period > strong {
+  color: #15803d !important;
+  font-weight: 800 !important;
+}
+
+/* Take Break control: solid orange fill. */
+.rx-reference-mode .rx-take-break,
+.rx-reference-mode .rx-break-button {
+  background-color: #ea580c !important;
+  border-color: #ea580c !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-take-break:hover,
+.rx-reference-mode .rx-break-button:hover {
+  background-color: #c2410c !important;
+  border-color: #c2410c !important;
+  color: #ffffff !important;
+}
+
+/* Active break/countdown remains orange and bold. */
+.rx-reference-mode .rx-queue-break-inline > span,
+.rx-reference-mode .rx-queue-break-inline > strong,
+.rx-reference-mode .rx-queue-break-inline > strong svg {
+  color: #ea580c !important;
+  font-weight: 800 !important;
+}
+
+/* Dark mode: period stays green family. */
+.dark .rx-reference-mode .rx-consultation-stat-period {
+  background: #132b24 !important;
+  border-color: #2e5b48 !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-stat-period::before {
+  background: #4ade80 !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-stat-period > span,
+.dark .rx-reference-mode .rx-consultation-stat-period > strong {
+  color: #4ade80 !important;
+}
