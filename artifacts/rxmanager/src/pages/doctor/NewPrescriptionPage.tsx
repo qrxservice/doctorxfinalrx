@@ -3995,7 +3995,7 @@ export default function NewPrescriptionPage() {
               </div>
 
                {/* ── CONSULTATION SUMMARY ─────────────────────────────── */}
-               <section className="mb-4 rounded-xl border border-teal-200 bg-teal-50/40 p-2.5 dark:border-teal-900 dark:bg-teal-950/20" aria-label={L.consultationSummary}>
+               <section className="rx-consultation-summary mb-4 rounded-xl border border-teal-200 bg-teal-50/40 p-2.5 dark:border-teal-900 dark:bg-teal-950/20" aria-label={L.consultationSummary}>
                  <div className="mb-2 flex flex-wrap items-center justify-between gap-1.5">
                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-teal-800 dark:text-teal-200">
                      <TrendingUp className="h-3.5 w-3.5" />
@@ -4042,19 +4042,19 @@ export default function NewPrescriptionPage() {
                    </div>
                  </div>
                  <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
-                   <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
+                   <div className="rx-consultation-stat rx-consultation-stat-patients min-w-0 rounded-lg border bg-background px-2 py-1.5">
                      <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "রোগী" : "Patients"}</span>
                      <strong className="mt-0.5 block text-sm text-foreground">{selectedConsultationStats.patients}</strong>
                    </div>
-                   <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
+                   <div className="rx-consultation-stat rx-consultation-stat-earnings min-w-0 rounded-lg border bg-background px-2 py-1.5">
                      <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "আয়" : "Earnings"}</span>
                      <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{consultationCurrencySymbol}{selectedConsultationStats.earnings}</strong>
                    </div>
-                   <div className="min-w-0 rounded-lg border bg-background px-2 py-1.5">
+                   <div className="rx-consultation-stat rx-consultation-stat-free min-w-0 rounded-lg border bg-background px-2 py-1.5">
                      <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "ফ্রি রোগী" : "Free Patients"}</span>
                      <strong className="mt-0.5 block text-sm text-amber-700 dark:text-amber-300">{selectedConsultationStats.freePatients}</strong>
                    </div>
-                   <div className="col-span-3 hidden min-w-0 rounded-lg border bg-background px-2 py-1.5 sm:block">
+                   <div className="rx-consultation-stat rx-consultation-stat-period col-span-3 hidden min-w-0 rounded-lg border bg-background px-2 py-1.5 sm:block">
                      <span className="block truncate text-[10px] text-muted-foreground">{isBn ? "নির্বাচিত সময়ের সারসংক্ষেপ" : "Selected Period Summary"}</span>
                      <strong className="mt-0.5 block text-sm text-foreground">
                        {consultationPeriod === "today" ? (isBn ? "আজ" : "Today") :

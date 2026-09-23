@@ -2960,3 +2960,163 @@
 .dark .rx-reference-mode .rx-context-panel .rx-diagnosis-field {
   background-color: #10272d !important;
 }
+
+/* === Consultation Summary: professional colourful statistics === */
+.rx-reference-mode .rx-consultation-summary {
+  background: linear-gradient(135deg, #f0fdfa 0%, #f0f9ff 52%, #f5f3ff 100%) !important;
+  border-color: #99d9cf !important;
+  box-shadow: 0 3px 12px rgba(15, 118, 110, 0.08);
+}
+
+.rx-reference-mode .rx-consultation-stat {
+  position: relative;
+  overflow: hidden;
+  border-width: 1px !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+.rx-reference-mode .rx-consultation-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+}
+
+.rx-reference-mode .rx-consultation-stat-patients {
+  background: #effaff !important;
+  border-color: #bae6fd !important;
+}
+.rx-reference-mode .rx-consultation-stat-patients::before { background: #0891b2; }
+.rx-reference-mode .rx-consultation-stat-patients strong { color: #0e7490 !important; }
+
+.rx-reference-mode .rx-consultation-stat-earnings {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+.rx-reference-mode .rx-consultation-stat-earnings::before { background: #16a34a; }
+.rx-reference-mode .rx-consultation-stat-earnings strong { color: #15803d !important; }
+
+.rx-reference-mode .rx-consultation-stat-free {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+.rx-reference-mode .rx-consultation-stat-free::before { background: #d97706; }
+.rx-reference-mode .rx-consultation-stat-free strong { color: #b45309 !important; }
+
+.rx-reference-mode .rx-consultation-stat-period {
+  background: #f5f3ff !important;
+  border-color: #ddd6fe !important;
+}
+.rx-reference-mode .rx-consultation-stat-period::before { background: #7c3aed; }
+.rx-reference-mode .rx-consultation-stat-period strong { color: #6d28d9 !important; }
+
+/* Dark mode: preserve the dark prescription feel with restrained colour accents. */
+.dark .rx-reference-mode .rx-consultation-summary {
+  background: #10272d !important;
+  border-color: #28545a !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-stat-patients {
+  background: #102a33 !important;
+  border-color: #285a67 !important;
+}
+.dark .rx-reference-mode .rx-consultation-stat-patients strong { color: #67e8f9 !important; }
+
+.dark .rx-reference-mode .rx-consultation-stat-earnings {
+  background: #132b24 !important;
+  border-color: #2e5b48 !important;
+}
+.dark .rx-reference-mode .rx-consultation-stat-earnings strong { color: #86efac !important; }
+
+.dark .rx-reference-mode .rx-consultation-stat-free {
+  background: #30291b !important;
+  border-color: #66542b !important;
+}
+.dark .rx-reference-mode .rx-consultation-stat-free strong { color: #fcd34d !important; }
+
+.dark .rx-reference-mode .rx-consultation-stat-period {
+  background: #272238 !important;
+  border-color: #51456f !important;
+}
+.dark .rx-reference-mode .rx-consultation-stat-period strong { color: #c4b5fd !important; }
+
+
+/* === Queue Summary: text colour only ===
+   Background/layout/borders/functions remain unchanged.
+   Blue + green + orange only. */
+
+.rx-reference-mode .rx-queue-summary-inline-title {
+  color: #087f5b !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-queue-live-indicator {
+  color: #16a34a !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-queue-inline-stats > div > span,
+.rx-reference-mode .rx-queue-inline-stats > div > strong {
+  font-weight: 800 !important;
+}
+
+/* Now Serving — blue */
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(1) > span,
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(1) > strong {
+  color: #2563eb !important;
+}
+
+/* Total Today — green */
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(2) > span,
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(2) > strong {
+  color: #15803d !important;
+}
+
+/* Waiting — orange */
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(3) > span,
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(3) > strong {
+  color: #d97706 !important;
+}
+
+/* In Consultation — blue */
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(4) > span,
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(4) > strong {
+  color: #0369a1 !important;
+}
+
+/* Completed — green */
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(5) > span,
+.rx-reference-mode .rx-queue-inline-stats > div:nth-child(5) > strong {
+  color: #047857 !important;
+}
+
+/* Break Active + countdown — orange */
+.rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > span,
+.rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > strong,
+.rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > strong svg {
+  color: #ea580c !important;
+  font-weight: 800 !important;
+}
+
+/* Dark mode: text colours only. */
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(1):not(.rx-queue-break-inline) > span,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(1):not(.rx-queue-break-inline) > strong,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(4) > span,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(4) > strong {
+  color: #60a5fa !important;
+}
+
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(2) > span,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(2) > strong,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(5) > span,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(5) > strong {
+  color: #4ade80 !important;
+}
+
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(3) > span,
+.dark .rx-reference-mode .rx-queue-inline-stats > div:nth-child(3) > strong,
+.dark .rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > span,
+.dark .rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > strong,
+.dark .rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > strong svg {
+  color: #fb923c !important;
+}
