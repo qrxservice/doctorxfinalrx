@@ -3120,3 +3120,29 @@
 .dark .rx-reference-mode .rx-queue-inline-stats > .rx-queue-break-inline > strong svg {
   color: #fb923c !important;
 }
+
+/* === Consultation Summary: Profile fee + Period emphasis === */
+.rx-reference-mode .rx-consultation-profile-fee {
+  color: #15803d !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-consultation-period {
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+.rx-reference-mode .rx-consultation-period > span {
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+/* Dark mode: text emphasis only. */
+.dark .rx-reference-mode .rx-consultation-profile-fee {
+  color: #4ade80 !important;
+}
+
+.dark .rx-reference-mode .rx-consultation-period,
+.dark .rx-reference-mode .rx-consultation-period > span {
+  color: #60a5fa !important;
+}

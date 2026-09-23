@@ -4021,11 +4021,11 @@ export default function NewPrescriptionPage() {
                           <Input type="number" min="0" step="1" className="h-7 w-20 px-1.5 text-[10px]" value={oldPatientFee} onChange={event => setOldPatientFee(event.target.value)} aria-label={L.oldPatientFee} />
                         </label>
                       ) : (
-                        <span className="text-[10px] font-medium text-muted-foreground">
+                        <span className="rx-consultation-profile-fee text-[10px] font-medium text-muted-foreground">
                           {L.normalPatientFee}: {consultationCurrencySymbol}{profileConsultationFee}
                         </span>
                       )}
-                     <label className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                     <label className="rx-consultation-period flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
                        <span>{isBn ? "সময়কাল" : "Period"}:</span>
                        <select
                          value={consultationPeriod}
