@@ -3358,3 +3358,47 @@
 .rx-reorderable-block {
   transition: opacity .15s ease, box-shadow .15s ease;
 }
+
+/* =========================================================
+   Prescription section drag/reorder — layout activation
+   Existing JSX/data/functions remain unchanged.
+   ========================================================= */
+
+/* LEFT:
+   Existing container already contains Patient Information/Vitals
+   followed by the reorderable clinical blocks.
+   Turn the existing vertical flow into a flex column so CSS order works. */
+.rx-reference-mode .rx-context-scroll > div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Everything that is NOT explicitly reorderable stays before
+   the doctor's custom-order section. */
+.rx-reference-mode .rx-context-scroll > div > :not(.rx-reorderable-block) {
+  order: -100;
+}
+
+/* RIGHT:
+   The prescription writing column already has Medicine first and
+   Advice/Treatment/Follow-up afterwards. Enable order on that flow. */
+.rx-reference-mode .rx-prescription-main {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep all fixed right-side content (medicine/composer/list etc.)
+   before the reorderable lower blocks. */
+.rx-reference-mode .rx-prescription-main > :not(.rx-reorderable-block) {
+  order: -100;
+}
+
+/* Movable blocks remain normal vertical blocks. */
+.rx-reference-mode .rx-reorderable-block {
+  flex: 0 0 auto;
+}
+
+/* Clear visual feedback while a handle is being used. */
+.rx-reference-mode .rx-block-drag-handle {
+  touch-action: none;
+}
