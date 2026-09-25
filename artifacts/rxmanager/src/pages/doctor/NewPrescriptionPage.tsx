@@ -714,6 +714,36 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
   const rxDate = new Date(rx.createdAt).toLocaleDateString(L.dateLocale, { day: "2-digit", month: "2-digit", year: "numeric" });
   const vitalsLines: string[] = rx.vitals ? String(rx.vitals).split(/[\n,]+/).map((v: string) => v.trim()).filter(Boolean) : [];
 
+  const printSectionOrder = (() => {
+    const defaults = {
+      left: ["diagnosis", "cc", "oe", "ix", "drugHistory"],
+      right: ["advice", "treatmentNote", "followUp"],
+    };
+
+    try {
+      const parsed = JSON.parse(localStorage.getItem("doctorx_rx_section_order") || "null");
+
+      const normalize = (column: "left" | "right") => {
+        const allowed = defaults[column];
+        const saved = Array.isArray(parsed?.[column])
+          ? parsed[column].filter(
+              (key: unknown): key is string =>
+                typeof key === "string" && allowed.includes(key)
+            )
+          : [];
+
+        return [...saved, ...allowed.filter(key => !saved.includes(key))];
+      };
+
+      return {
+        left: normalize("left"),
+        right: normalize("right"),
+      };
+    } catch {
+      return defaults;
+    }
+  })();
+
   return (
     <div className={cn("rx-print-page rx-prescription-font min-h-screen bg-gray-100 p-4 print:p-0 print:bg-white", isBn && "rx-bangla-font")}>
       <PrescriptionFontStyles />
@@ -785,41 +815,61 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
           <div className="rx-print-body flex border-b-2 border-gray-800" style={{ minHeight: "120mm" }}>
             <div className="rx-print-clinical w-1/3 pr-3 py-3 border-r border-gray-300 space-y-3 text-sm">
               <div className="text-xs text-gray-500">{L.visitNo}</div>
-              {rx.chiefComplaint && (
-                <div>
-                  <p className="font-semibold text-gray-700">C/C</p>
-                  <p className="text-sm whitespace-pre-wrap">{rx.chiefComplaint}</p>
-                </div>
-              )}
-              {(vitalsLines.length > 0 || rx.examination) && (
-                <div>
-                  <p className="font-semibold text-gray-700">O/E</p>
-                  {vitalsLines.map((v, i) => (<p key={i} className="leading-snug">{v}</p>))}
-                   {rx.examination && <p className="text-sm whitespace-pre-wrap mt-1">{rx.examination}</p>}
-                </div>
-              )}
-              {rx.diagnosis && (
-                <div>
-                  <p className="font-semibold text-gray-700">Dx</p>
-                  <p className="font-medium">{rx.diagnosis}</p>
-                </div>
-              )}
-              {rx.investigations && (
-                <div>
-                  <p className="font-semibold text-gray-700">{L.ixShort}</p>
-                  {rx.investigations.split(",").map((v: string, i: number) => (
-                     <p key={i} className="text-sm">{v.trim()}</p>
-                  ))}
-                </div>
-              )}
-              {rx.advice && (
-                <div>
-                  <p className="font-semibold text-gray-700">{L.advicePrint}</p>
-                  {rx.advice.split("\n").filter(Boolean).map((a: string, i: number) => (
-                     <p key={i} className="text-sm whitespace-pre-wrap">{a}</p>
-                  ))}
-                </div>
-              )}
+              {printSectionOrder.left.map(section => {
+                if (section === "diagnosis" && rx.diagnosis) {
+                  return (
+                    <div key={section}>
+                      <p className="font-semibold text-gray-700">Dx</p>
+                      <p className="font-medium">{rx.diagnosis}</p>
+                    </div>
+                  );
+                }
+
+                if (section === "cc" && rx.chiefComplaint) {
+                  return (
+                    <div key={section}>
+                      <p className="font-semibold text-gray-700">C/C</p>
+                      <p className="text-sm whitespace-pre-wrap">{rx.chiefComplaint}</p>
+                    </div>
+                  );
+                }
+
+                if (section === "oe" && (vitalsLines.length > 0 || rx.examination)) {
+                  return (
+                    <div key={section}>
+                      <p className="font-semibold text-gray-700">O/E</p>
+                      {vitalsLines.map((v, i) => (
+                        <p key={i} className="leading-snug">{v}</p>
+                      ))}
+                      {rx.examination && (
+                        <p className="text-sm whitespace-pre-wrap mt-1">{rx.examination}</p>
+                      )}
+                    </div>
+                  );
+                }
+
+                if (section === "ix" && rx.investigations) {
+                  return (
+                    <div key={section}>
+                      <p className="font-semibold text-gray-700">{L.ixShort}</p>
+                      {rx.investigations.split(",").map((v: string, i: number) => (
+                        <p key={i} className="text-sm">{v.trim()}</p>
+                      ))}
+                    </div>
+                  );
+                }
+
+                if (section === "drugHistory" && rx.drugHistory) {
+                  return (
+                    <div key={section}>
+                      <p className="font-semibold text-gray-700">{L.drugHistory}</p>
+                      <p className="text-sm whitespace-pre-wrap">{rx.drugHistory}</p>
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
             </div>
             <div className="rx-print-medicines w-2/3 pl-5 py-3">
               <div className="rx-print-symbol mb-2" aria-label="Rx">℞</div>
@@ -840,15 +890,37 @@ function PrintView({ rx, doctor, settings, qrDataUrl, adminQrEnabled = true, nex
                   </div>
                 ))}
               </div>
-              {rx.notes && (
-                <div className="mt-4 text-sm">
-                  <p className="font-semibold text-gray-700">{L.treatmentNoteTitle}</p>
-                   <p className="text-sm text-gray-700 whitespace-pre-wrap">{rx.notes}</p>
-                </div>
-              )}
-              {rx.followUpDate && (
-                <p className="mt-3 text-sm font-medium text-gray-800">{L.followUpPrint} {rx.followUpDate}</p>
-              )}
+              {printSectionOrder.right.map(section => {
+                if (section === "advice" && rx.advice) {
+                  return (
+                    <div key={section} className="mt-4 text-sm">
+                      <p className="font-semibold text-gray-700">{L.advicePrint}</p>
+                      {rx.advice.split("\n").filter(Boolean).map((a: string, i: number) => (
+                        <p key={i} className="text-sm whitespace-pre-wrap">{a}</p>
+                      ))}
+                    </div>
+                  );
+                }
+
+                if (section === "treatmentNote" && rx.notes) {
+                  return (
+                    <div key={section} className="mt-4 text-sm">
+                      <p className="font-semibold text-gray-700">{L.treatmentNoteTitle}</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{rx.notes}</p>
+                    </div>
+                  );
+                }
+
+                if (section === "followUp" && rx.followUpDate) {
+                  return (
+                    <p key={section} className="mt-3 text-sm font-medium text-gray-800">
+                      {L.followUpPrint} {rx.followUpDate}
+                    </p>
+                  );
+                }
+
+                return null;
+              })}
             </div>
           </div>
 
