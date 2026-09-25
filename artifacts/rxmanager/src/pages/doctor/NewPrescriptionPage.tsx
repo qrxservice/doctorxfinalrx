@@ -975,7 +975,41 @@ export default function NewPrescriptionPage() {
     key: string;
   } | null>(null);
 
-  const rxSectionOrderIndex = (column: RxSectionColumn, key: string) => {
+  useEffect(() => {
+  try {
+    localStorage.setItem("doctorx_rx_section_order", JSON.stringify(rxSectionOrder));
+  } catch {}
+
+  const applySavedSectionOrder = (keys: string[]) => {
+    const blocks = keys
+      .map(key =>
+        document.querySelector<HTMLElement>(
+          `[data-rx-section="${key}"]`
+        )
+      )
+      .filter((block): block is HTMLElement => Boolean(block));
+
+    if (blocks.length !== keys.length) return;
+
+    const parent = blocks[0]?.parentElement;
+    if (!parent) return;
+
+    if (blocks.some(block => block.parentElement !== parent)) return;
+
+    for (const block of blocks) {
+      parent.appendChild(block);
+    }
+  };
+
+  const frame = window.requestAnimationFrame(() => {
+    applySavedSectionOrder(rxSectionOrder.left);
+    applySavedSectionOrder(rxSectionOrder.right);
+  });
+
+  return () => window.cancelAnimationFrame(frame);
+}, [rxSectionOrder]);
+
+const rxSectionOrderIndex = (column: RxSectionColumn, key: string) => {
     const index = rxSectionOrder[column].indexOf(key);
     return index < 0 ? 0 : index;
   };
@@ -3177,7 +3211,8 @@ export default function NewPrescriptionPage() {
               <Separator className="my-1" />
               <div
                 className="rx-reorderable-block"
-                style={{ order: rxSectionOrderIndex("left", "attachments") }}
+                data-rx-section="attachments"
+                 style={{ order: rxSectionOrderIndex("left", "attachments") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("left", "attachments"); }}
               >
@@ -3224,6 +3259,7 @@ export default function NewPrescriptionPage() {
                {/* Diagnosis sits immediately above C/C in the clinical panel. */}
                <div
                  className="rx-diagnosis-field rx-reorderable-block rounded-lg border border-teal-100 bg-teal-50/50 p-3 dark:border-teal-900 dark:bg-teal-950/20"
+                 data-rx-section="diagnosis"
                  style={{ order: rxSectionOrderIndex("left", "diagnosis") }}
                  onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                  onDrop={event => { event.preventDefault(); dropRxSection("left", "diagnosis"); }}
@@ -3242,7 +3278,8 @@ export default function NewPrescriptionPage() {
               <div
                 className="rx-clinical-section rx-cc-section rx-reorderable-block"
                 data-section-open={ccOpen}
-                style={{ order: rxSectionOrderIndex("left", "cc") }}
+                data-rx-section="cc"
+                 style={{ order: rxSectionOrderIndex("left", "cc") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("left", "cc"); }}
               >
@@ -3295,7 +3332,8 @@ export default function NewPrescriptionPage() {
               <div
                 className="rx-clinical-section rx-oe-section rx-reorderable-block"
                 data-section-open={oeOpen}
-                style={{ order: rxSectionOrderIndex("left", "oe") }}
+                data-rx-section="oe"
+                 style={{ order: rxSectionOrderIndex("left", "oe") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("left", "oe"); }}
               >
@@ -3353,7 +3391,8 @@ export default function NewPrescriptionPage() {
               <div
                 className="rx-clinical-section rx-ix-section rx-reorderable-block"
                 data-section-open={ixOpen}
-                style={{ order: rxSectionOrderIndex("left", "ix") }}
+                data-rx-section="ix"
+                 style={{ order: rxSectionOrderIndex("left", "ix") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("left", "ix"); }}
               >
@@ -3412,7 +3451,8 @@ export default function NewPrescriptionPage() {
               {/* Drug History */}
               <div
                 className="rx-clinical-section rx-drug-history-section rx-reorderable-block"
-                style={{ order: rxSectionOrderIndex("left", "drugHistory") }}
+                data-rx-section="drugHistory"
+                 style={{ order: rxSectionOrderIndex("left", "drugHistory") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("left", "drugHistory"); }}
               >
@@ -3457,7 +3497,8 @@ export default function NewPrescriptionPage() {
               {/* RX QUICK TOOLS — a compact, extensible tool list. */}
               <div
                 className="rx-reorderable-block rounded-lg border border-teal-200 bg-teal-50/50 p-2 dark:border-teal-900 dark:bg-teal-950/20"
-                style={{ order: rxSectionOrderIndex("left", "quickTools") }}
+                data-rx-section="quickTools"
+                 style={{ order: rxSectionOrderIndex("left", "quickTools") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("left", "quickTools"); }}
               >
@@ -3985,7 +4026,8 @@ export default function NewPrescriptionPage() {
               {/* ── ADVICE ─────────────────────────────────────────── */}
               <div
                 className="rx-notes-card rx-reorderable-block border rounded-xl overflow-hidden shadow-sm"
-                style={{ order: rxSectionOrderIndex("right", "advice") }}
+                data-rx-section="advice"
+                 style={{ order: rxSectionOrderIndex("right", "advice") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("right", "advice"); }}
               >
@@ -4036,7 +4078,8 @@ export default function NewPrescriptionPage() {
               {/* ── TREATMENT NOTE ───────────────────────────────────── */}
               <div
                 className="rx-notes-card rx-reorderable-block border rounded-xl overflow-hidden shadow-sm"
-                style={{ order: rxSectionOrderIndex("right", "treatmentNote") }}
+                data-rx-section="treatmentNote"
+                 style={{ order: rxSectionOrderIndex("right", "treatmentNote") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("right", "treatmentNote"); }}
               >
@@ -4079,7 +4122,8 @@ export default function NewPrescriptionPage() {
 </div>
               <div
                 className="rx-followup-card rx-reorderable-block rx-prescription-font flex min-w-0 w-full max-w-full flex-col gap-1.5 rounded-xl border bg-background px-3 py-3"
-                style={{ order: rxSectionOrderIndex("right", "followUp") }}
+                data-rx-section="followUp"
+                 style={{ order: rxSectionOrderIndex("right", "followUp") }}
                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
                 onDrop={event => { event.preventDefault(); dropRxSection("right", "followUp"); }}
               >
