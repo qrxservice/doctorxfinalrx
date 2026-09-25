@@ -945,6 +945,87 @@ export default function NewPrescriptionPage() {
   const [medicines, setMedicines] = useState<MedItem[]>([]);
   const [editingMedicineId, setEditingMedicineId] = useState<string | null>(null);
   const [draggedMedicineId, setDraggedMedicineId] = useState<string | null>(null);
+
+  type RxSectionColumn = "left" | "right";
+
+  const DEFAULT_RX_SECTION_ORDER: Record<RxSectionColumn, string[]> = {
+    left: ["attachments", "diagnosis", "cc", "oe", "ix", "drugHistory", "quickTools"],
+    right: ["advice", "treatmentNote", "followUp"],
+  };
+
+  const [rxSectionOrder, setRxSectionOrder] = useState<Record<RxSectionColumn, string[]>>(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem("doctorx_rx_section_order") || "null");
+      const normalize = (column: RxSectionColumn) => {
+        const defaults = DEFAULT_RX_SECTION_ORDER[column];
+        const saved = Array.isArray(parsed?.[column])
+          ? parsed[column].filter((key: unknown): key is string =>
+              typeof key === "string" && defaults.includes(key))
+          : [];
+        return [...saved, ...defaults.filter(key => !saved.includes(key))];
+      };
+      return { left: normalize("left"), right: normalize("right") };
+    } catch {
+      return DEFAULT_RX_SECTION_ORDER;
+    }
+  });
+
+  const [draggedRxSection, setDraggedRxSection] = useState<{
+    column: RxSectionColumn;
+    key: string;
+  } | null>(null);
+
+  const rxSectionOrderIndex = (column: RxSectionColumn, key: string) => {
+    const index = rxSectionOrder[column].indexOf(key);
+    return index < 0 ? 0 : index;
+  };
+
+  const dropRxSection = (column: RxSectionColumn, targetKey: string) => {
+    if (!draggedRxSection || draggedRxSection.column !== column || draggedRxSection.key === targetKey) {
+      setDraggedRxSection(null);
+      return;
+    }
+
+    setRxSectionOrder(current => {
+      const nextColumn = [...current[column]];
+      const fromIndex = nextColumn.indexOf(draggedRxSection.key);
+      const toIndex = nextColumn.indexOf(targetKey);
+
+      if (fromIndex < 0 || toIndex < 0) return current;
+
+      const [moved] = nextColumn.splice(fromIndex, 1);
+      nextColumn.splice(toIndex, 0, moved);
+
+      const next = { ...current, [column]: nextColumn };
+
+      try {
+        localStorage.setItem("doctorx_rx_section_order", JSON.stringify(next));
+      } catch {}
+
+      return next;
+    });
+
+    setDraggedRxSection(null);
+  };
+
+  const rxSectionDragHandle = (column: RxSectionColumn, key: string) => (
+    <span
+      className="rx-block-drag-handle cursor-grab select-none rounded px-1 text-muted-foreground active:cursor-grabbing"
+      title={isBn ? "ব্লক টেনে সাজান" : "Drag block to reorder"}
+      aria-label={isBn ? "ব্লক টেনে সাজান" : "Drag block to reorder"}
+      role="button"
+      tabIndex={0}
+      draggable
+      onDragStart={event => {
+        setDraggedRxSection({ column, key });
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", key);
+      }}
+      onDragEnd={() => setDraggedRxSection(null)}
+    >
+      <span aria-hidden="true">⠿</span>
+    </span>
+  );
   const [advice, setAdvice] = useState("");
   const [treatmentNote, setTreatmentNote] = useState("");
   const [followUpDate, setFollowUpDate] = useState("");
@@ -3005,13 +3086,13 @@ export default function NewPrescriptionPage() {
                       <span className="text-[10px] font-semibold text-muted-foreground">{patient.name.charAt(0).toUpperCase()}</span>
                     </div>
                   ) : null}
-                  <label className="text-[10px] text-muted-foreground font-semibold">{L.patientName}</label>
+                  <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.patientName}</label>
                 </div>
                 <Input className="h-6 text-xs" placeholder={L.typeNamePlaceholder} value={patient.name} onChange={e => setPatient(p => ({ ...p, name: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-1">
                 <div>
-                  <label className="text-[10px] text-muted-foreground font-semibold">{L.age}</label>
+                  <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.age}</label>
                   <div className="flex gap-1 mt-0.5">
                     <Input className="h-6 text-xs flex-1 min-w-0" type="number" placeholder="25" value={patient.age} onChange={e => setPatient(p => ({ ...p, age: e.target.value }))} />
                     <select className="h-6 text-xs border rounded bg-background px-1" value={patient.ageUnit} onChange={e => setPatient(p => ({ ...p, ageUnit: e.target.value }))}>
@@ -3020,27 +3101,27 @@ export default function NewPrescriptionPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-[10px] text-muted-foreground font-semibold">{L.gender}</label>
+                  <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.gender}</label>
                   <select className="h-6 w-full text-xs border rounded bg-background px-1 mt-0.5" value={patient.sex} onChange={e => setPatient(p => ({ ...p, sex: e.target.value }))}>
                     <option value="M">{L.male}</option><option value="F">{L.female}</option><option value="O">{L.other}</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="text-[10px] text-muted-foreground font-semibold">{L.mobile}</label>
+                <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.mobile}</label>
                 <Input className="h-6 text-xs mt-0.5" placeholder="01XXXXXXXXX" value={patient.phone} onChange={e => setPatient(p => ({ ...p, phone: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-muted-foreground font-semibold">{L.address}</label>
+                <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.address}</label>
                 <Input className="h-6 text-xs mt-0.5" placeholder={L.addressPlaceholder} value={patient.address} onChange={e => setPatient(p => ({ ...p, address: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-1">
                 <div>
-                  <label className="text-[10px] text-muted-foreground font-semibold">{L.regNo}</label>
+                  <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.regNo}</label>
                   <Input className="h-6 text-xs mt-0.5" placeholder={L.regNo} value={patient.regNo} onChange={e => setPatient(p => ({ ...p, regNo: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="text-[10px] text-muted-foreground font-semibold">{L.date}</label>
+                  <label className="rx-target-green-label text-[10px] text-muted-foreground font-semibold">{L.date}</label>
                   <Input className="h-6 text-xs mt-0.5" type="date" value={patient.date} onChange={e => setPatient(p => ({ ...p, date: e.target.value }))} />
                 </div>
               </div>
@@ -3094,8 +3175,16 @@ export default function NewPrescriptionPage() {
               </div>
 
               <Separator className="my-1" />
-              <div>
-                <label className="text-[10px] font-bold text-teal-700 dark:text-teal-400">{L.attachments}</label>
+              <div
+                className="rx-reorderable-block"
+                style={{ order: rxSectionOrderIndex("left", "attachments") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("left", "attachments"); }}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <label className="text-[10px] font-bold text-teal-700 dark:text-teal-400">{L.attachments}</label>
+                  {rxSectionDragHandle("left", "attachments")}
+                </div>
                 <div className="flex flex-col gap-1 mt-0.5">
                   {patient.labReportUrl && (
                     <button type="button" className="text-[10px] text-blue-600 dark:text-blue-400 underline flex items-center gap-1 text-left" onClick={() => downloadObject(patient.labReportUrl, "lab-report")}>
@@ -3133,8 +3222,16 @@ export default function NewPrescriptionPage() {
               <Separator className="my-1" />
 
                {/* Diagnosis sits immediately above C/C in the clinical panel. */}
-               <div className="rx-diagnosis-field rounded-lg border border-teal-100 bg-teal-50/50 p-3 dark:border-teal-900 dark:bg-teal-950/20">
-                 <label className="text-sm text-green-700 dark:text-green-400 font-semibold uppercase tracking-wide">{L.diagnosisDx}</label>
+               <div
+                 className="rx-diagnosis-field rx-reorderable-block rounded-lg border border-teal-100 bg-teal-50/50 p-3 dark:border-teal-900 dark:bg-teal-950/20"
+                 style={{ order: rxSectionOrderIndex("left", "diagnosis") }}
+                 onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                 onDrop={event => { event.preventDefault(); dropRxSection("left", "diagnosis"); }}
+               >
+                 <div className="flex items-center justify-between gap-1">
+                   <label className="text-sm text-green-700 dark:text-green-400 font-semibold uppercase tracking-wide">{L.diagnosisDx}</label>
+                   {rxSectionDragHandle("left", "diagnosis")}
+                 </div>
                  <Input id="diagnosis-field" className="h-8 text-sm mt-0.5" placeholder={L.diagnosisPlaceholder} value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
                </div>
 
@@ -3142,9 +3239,16 @@ export default function NewPrescriptionPage() {
 
               {/* C/C — always visible; the existing open state remains available
                   for loaded/draft data and is marked when the field is focused. */}
-              <div className="rx-clinical-section rx-cc-section" data-section-open={ccOpen}>
+              <div
+                className="rx-clinical-section rx-cc-section rx-reorderable-block"
+                data-section-open={ccOpen}
+                style={{ order: rxSectionOrderIndex("left", "cc") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("left", "cc"); }}
+              >
                 <div className="flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400 justify-between">
                   <span className="flex items-center gap-1">
+                    {rxSectionDragHandle("left", "cc")}
                     {L.ccLabel}
                     {patient.cc && <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />}
                   </span>
@@ -3188,9 +3292,16 @@ export default function NewPrescriptionPage() {
               <Separator className="my-1" />
 
               {/* O/E — always visible; preserve the existing text/box mode control. */}
-              <div className="rx-clinical-section rx-oe-section" data-section-open={oeOpen}>
+              <div
+                className="rx-clinical-section rx-oe-section rx-reorderable-block"
+                data-section-open={oeOpen}
+                style={{ order: rxSectionOrderIndex("left", "oe") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("left", "oe"); }}
+              >
                 <div className="flex items-center gap-1 justify-between">
                   <span className="flex-1 flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400">
+                    {rxSectionDragHandle("left", "oe")}
                     O/E
                     {patient.oe && <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />}
                   </span>
@@ -3239,9 +3350,16 @@ export default function NewPrescriptionPage() {
               <Separator className="my-1" />
 
               {/* IX — always visible and editable. */}
-              <div className="rx-clinical-section rx-ix-section" data-section-open={ixOpen}>
+              <div
+                className="rx-clinical-section rx-ix-section rx-reorderable-block"
+                data-section-open={ixOpen}
+                style={{ order: rxSectionOrderIndex("left", "ix") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("left", "ix"); }}
+              >
                 <div className="flex items-center gap-1 text-xs font-bold text-teal-700 dark:text-teal-400 justify-between">
                   <span className="flex items-center gap-1">
+                    {rxSectionDragHandle("left", "ix")}
                     {L.ixLabel}
                     {(patient.ixChips.length > 0 || patient.ixCustom) && <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />}
                   </span>
@@ -3292,9 +3410,17 @@ export default function NewPrescriptionPage() {
               <Separator className="my-1" />
 
               {/* Drug History */}
-              <div className="rx-clinical-section rx-drug-history-section">
+              <div
+                className="rx-clinical-section rx-drug-history-section rx-reorderable-block"
+                style={{ order: rxSectionOrderIndex("left", "drugHistory") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("left", "drugHistory"); }}
+              >
                 <div className="rx-section-header">
-                  <label className="text-xs font-bold">{L.drugHistory}</label>
+                  <div className="flex items-center gap-1">
+                    {rxSectionDragHandle("left", "drugHistory")}
+                    <label className="text-xs font-bold">{L.drugHistory}</label>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setDrugHistoryOpen(v => !v)}
@@ -3329,10 +3455,17 @@ export default function NewPrescriptionPage() {
               <Separator className="my-1" />
 
               {/* RX QUICK TOOLS — a compact, extensible tool list. */}
-              <div className="rounded-lg border border-teal-200 bg-teal-50/50 p-2 dark:border-teal-900 dark:bg-teal-950/20">
+              <div
+                className="rx-reorderable-block rounded-lg border border-teal-200 bg-teal-50/50 p-2 dark:border-teal-900 dark:bg-teal-950/20"
+                style={{ order: rxSectionOrderIndex("left", "quickTools") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("left", "quickTools"); }}
+              >
+                <div className="flex items-start gap-1">
+                  {rxSectionDragHandle("left", "quickTools")}
                 <button
                   type="button"
-                  className="mb-1.5 flex w-full items-center justify-between text-left"
+                  className="mb-1.5 flex min-w-0 flex-1 items-center justify-between text-left"
                   onClick={() => setShowQuickTools(v => !v)}
                   aria-expanded={showQuickTools}
                 >
@@ -3341,6 +3474,7 @@ export default function NewPrescriptionPage() {
                   </span>
                   {showQuickTools ? <ChevronUp className="h-3 w-3 text-teal-600 dark:text-teal-400" /> : <ChevronDown className="h-3 w-3 text-teal-600 dark:text-teal-400" />}
                 </button>
+                </div>
                 {showQuickTools && (
                   <div className="space-y-1.5">
                     {/* Add future tools to quickToolItems without changing this list layout. */}
@@ -3549,7 +3683,7 @@ export default function NewPrescriptionPage() {
                       )}
                       {recentMedicineShortcuts.length > 0 && (
                         <div>
-                          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{L.recentMedicines}</p>
+                          <p className="rx-target-green-label mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{L.recentMedicines}</p>
                           <div className="flex flex-wrap gap-1">
                             {recentMedicineShortcuts.map(shortcut => (
                               <div key={shortcut.key} className="flex items-center rounded border bg-background text-xs">
@@ -3647,7 +3781,7 @@ export default function NewPrescriptionPage() {
                   {/* Dose → Timing → Duration: compact, side-by-side controls on tablet/desktop. */}
                   <div className="rx-dose-grid grid grid-cols-1 gap-2 md:grid-cols-3">
                     <label className="min-w-0 space-y-1">
-                      <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{L.dose}</span>
+                      <span className="rx-target-green-label text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{L.dose}</span>
                       <select
                         className="h-7 w-full min-w-0 rounded border bg-background px-1.5 text-xs"
                         value={selectedDoseTemplate}
@@ -3669,7 +3803,7 @@ export default function NewPrescriptionPage() {
                     </label>
 
                     <label className="min-w-0 space-y-1">
-                      <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{L.timing}</span>
+                      <span className="rx-target-green-label text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{L.timing}</span>
                       <select
                         className="h-7 w-full min-w-0 rounded border bg-background px-1.5 text-xs"
                         value={selectedTimingTemplate}
@@ -3691,7 +3825,7 @@ export default function NewPrescriptionPage() {
                     </label>
 
                     <label className="min-w-0 space-y-1">
-                      <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{L.duration}</span>
+                      <span className="rx-target-green-label text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{L.duration}</span>
                       <select
                         className="h-7 w-full min-w-0 rounded border bg-background px-1.5 text-xs"
                         value={selectedDurationTemplate}
@@ -3849,9 +3983,17 @@ export default function NewPrescriptionPage() {
               </button>
 
               {/* ── ADVICE ─────────────────────────────────────────── */}
-              <div className="rx-notes-card border rounded-xl overflow-hidden shadow-sm">
+              <div
+                className="rx-notes-card rx-reorderable-block border rounded-xl overflow-hidden shadow-sm"
+                style={{ order: rxSectionOrderIndex("right", "advice") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("right", "advice"); }}
+              >
                 <div className="rx-section-header">
-                  <h3 className="text-xs font-bold">{L.advice}</h3>
+                  <div className="flex items-center gap-1">
+                    {rxSectionDragHandle("right", "advice")}
+                    <h3 className="text-xs font-bold">{L.advice}</h3>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setAdviceOpen(v => !v)}
@@ -3892,9 +4034,17 @@ export default function NewPrescriptionPage() {
 </div>
 
               {/* ── TREATMENT NOTE ───────────────────────────────────── */}
-              <div className="rx-notes-card border rounded-xl overflow-hidden shadow-sm">
+              <div
+                className="rx-notes-card rx-reorderable-block border rounded-xl overflow-hidden shadow-sm"
+                style={{ order: rxSectionOrderIndex("right", "treatmentNote") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("right", "treatmentNote"); }}
+              >
                 <div className="rx-section-header">
-                  <h3 className="text-xs font-bold">{L.treatmentNote}</h3>
+                  <div className="flex items-center gap-1">
+                    {rxSectionDragHandle("right", "treatmentNote")}
+                    <h3 className="text-xs font-bold">{L.treatmentNote}</h3>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setTreatmentNoteOpen(v => !v)}
@@ -3927,16 +4077,22 @@ export default function NewPrescriptionPage() {
                   </div>
                 )}
 </div>
-              <div className="rx-followup-card rx-prescription-font flex min-w-0 w-full max-w-full flex-col gap-1.5 rounded-xl border bg-background px-3 py-3">
+              <div
+                className="rx-followup-card rx-reorderable-block rx-prescription-font flex min-w-0 w-full max-w-full flex-col gap-1.5 rounded-xl border bg-background px-3 py-3"
+                style={{ order: rxSectionOrderIndex("right", "followUp") }}
+                onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }}
+                onDrop={event => { event.preventDefault(); dropRxSection("right", "followUp"); }}
+              >
                  <div className="flex min-w-0 w-full flex-wrap items-center gap-1.5">
-                   <label className="text-xs font-bold uppercase tracking-wide text-green-700 dark:text-green-400 whitespace-nowrap">{L.followUpDate}</label>
+                   {rxSectionDragHandle("right", "followUp")}
+                   <label className="rx-target-green-label text-xs font-bold uppercase tracking-wide whitespace-nowrap">{L.followUpDate}</label>
                    <Input
                      className="h-7 min-w-[8rem] max-w-full flex-1 text-xs sm:max-w-[14rem]"
                      type={followUpDate && !/^\d{4}-\d{2}-\d{2}$/.test(followUpDate) ? "text" : "date"}
                      value={followUpDate}
                      onChange={e => setFollowUpDate(e.target.value)}
                    />
-                    <label className="text-[10px] text-muted-foreground font-semibold uppercase whitespace-nowrap">
+                    <label className="rx-target-green-label text-[10px] font-semibold uppercase whitespace-nowrap">
                       {isBn ? "ফলো-আপ টেমপ্লেট" : "Follow-up Template"}
                    </label>
                    <select

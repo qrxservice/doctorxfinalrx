@@ -3325,3 +3325,36 @@
   color: #fb923c !important;
   stroke: #fb923c !important;
 }
+
+/* === Requested prescription labels only: attachment teal/green + bold === */
+.rx-reference-mode .rx-target-green-label {
+  color: #079889 !important;
+  font-weight: 800 !important;
+}
+
+.dark .rx-reference-mode .rx-target-green-label {
+  color: #079889 !important;
+  font-weight: 800 !important;
+}
+
+/* === Prescription block reorder === */
+.rx-block-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  min-height: 1.25rem;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: .7;
+  transition: opacity .15s ease, background-color .15s ease;
+}
+
+.rx-block-drag-handle:hover {
+  opacity: 1;
+  background: rgba(8, 127, 115, .10);
+}
+
+.rx-reorderable-block {
+  transition: opacity .15s ease, box-shadow .15s ease;
+}
